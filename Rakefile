@@ -20,6 +20,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.homepage = "http://github.com/chetan/micron"
   gemspec.authors = ["Chetan Sarva"]
   gemspec.license = "MIT"
+  gemspec.executables = ["micron"]
 end
 Jeweler::RubygemsDotOrgTasks.new
 

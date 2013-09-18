@@ -13,11 +13,13 @@ Gem::Specification.new do |s|
   s.date = "2013-09-18"
   s.description = "An extremely minimal unit test library for Ruby"
   s.email = "chetan@pixelcop.net"
+  s.executables = ["micron"]
   s.files = [
     "Gemfile",
     "Gemfile.lock",
     "Rakefile",
     "VERSION",
+    "bin/micron",
     "lib/micron.rb",
     "lib/micron/assertion.rb",
     "lib/micron/minitest.rb",
@@ -28,7 +30,8 @@ Gem::Specification.new do |s|
     "lib/micron/runner/method.rb",
     "lib/micron/test_case.rb",
     "lib/micron/test_case/assertions.rb",
-    "lib/micron/test_case/lifecycle_hooks.rb"
+    "lib/micron/test_case/lifecycle_hooks.rb",
+    "micron.gemspec"
   ]
   s.homepage = "http://github.com/chetan/micron"
   s.licenses = ["MIT"]

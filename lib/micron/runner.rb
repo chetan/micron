@@ -97,6 +97,7 @@ module Micron
     def load_and_run(file, w)
 
       begin
+        EasyCov.start
         require file
       rescue => ex
         Marshal.dump(ex, w)

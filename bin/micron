@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "micron/app"
+Micron::App.new.run
