@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/micron",
     "lib/micron.rb",
+    "lib/micron/app.rb",
     "lib/micron/assertion.rb",
     "lib/micron/minitest.rb",
     "lib/micron/runner.rb",
