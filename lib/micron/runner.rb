@@ -64,6 +64,7 @@ module Micron
         # fork for each process
         r,w = IO.pipe
         pid = fork do
+          $0 = "micron: class"
           load_and_run(file, w)
           Marshal.dump(END_OF_STREAM, w) # end of stream marker
         end

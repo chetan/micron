@@ -6,6 +6,8 @@ module Micron
 
     def run
 
+      $0 = "micron: runner"
+
       # Setup paths
       path = File.expand_path(Dir.pwd)
 
