@@ -46,7 +46,7 @@ module Micron
 
         rescue Exception => e
           self.passed = false
-          self.ex     = e
+          self.ex     = ExceptionInfo.new(e)
 
         ensure
           time(:teardown) {
@@ -108,7 +108,7 @@ module Micron
             raise
           rescue Exception => e
             self.passed = false
-            self.ex     = e
+            self.ex     = ExceptionInfo.new(e)
           end
         end
       end

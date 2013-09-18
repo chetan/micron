@@ -3,6 +3,7 @@ require "micron/runner/backtrace_filter"
 require "micron/runner/clazz"
 require "micron/runner/forking_clazz"
 require "micron/runner/method"
+require "micron/runner/exception_info"
 
 module Micron
 
@@ -49,7 +50,7 @@ module Micron
       clazz.methods.each do |m|
         puts "  #{m.name}: (#{m.status}) #{m.total_duration}"
         if m.failed? and !m.skipped? then
-          puts "  <#{m.ex.class}> #{m.ex.message}"
+          puts "  <#{m.ex.name}> #{m.ex.message}"
           puts "    " + Micron.filter_backtrace(m.ex.backtrace).join("\n    ")
           puts
           puts m.stdout
