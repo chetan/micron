@@ -23,10 +23,21 @@ module Micron
       end
 
       # Find tests to run
-      files = Dir.glob(File.join(path, "**/*.rb")).find_all { |f|
-        f = File.basename(f)
-        f =~ /^(test_.*|.*_test)\.rb$/
-      }
+      files = []
+      if not ARGV.empty? then
+        ARGV.each do |f|
+          if File.exists? f then
+            files << File.expand_path(f)
+          end
+        end
+      end
+
+      if files.empty? then
+        files = Dir.glob(File.join(path, "**/*.rb")).find_all { |f|
+          f = File.basename(f)
+          f =~ /^(test_.*|.*_test)\.rb$/
+        }
+      end
 
       # Run tests
       Micron::Runner.new(files).run
