@@ -50,7 +50,7 @@ module Micron
         puts "  #{m.name}: (#{m.status}) #{m.total_duration}"
         if m.failed? and !m.skipped? then
           puts "  <#{m.ex.class}> #{m.ex.message}"
-          puts "    #{m.ex.backtrace.first}"
+          puts "    " + Micron.filter_backtrace(m.ex.backtrace).join("\n    ")
           puts
           puts m.stdout
           puts m.stderr
