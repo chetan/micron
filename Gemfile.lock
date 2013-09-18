@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/chetan/easycov.git
-  revision: 0fce6e458f887e1fb50913c7af35c660fd80bc97
+  revision: e15dd5a8b04a87da5d3437719032014b3a4538a0
   specs:
     easycov (0.1.0)
       lockfile
