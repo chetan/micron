@@ -1,6 +1,8 @@
 
 require "mixlib/shellout"
 
+require "micron/runner/proc_clazz"
+
 module Micron
   class ProcRunner < Runner
 
@@ -9,6 +11,8 @@ module Micron
     end
 
     def run_all_tests
+      $0 = "micron: proc_runner"
+      ERR.puts "#{$0} (#{$$})"
 
       state_path = ENV["MICRON_PATH"]
       FileUtils.mkdir_p(state_path)
@@ -20,7 +24,7 @@ module Micron
         # cmd.run_command
         # pid = cmd.stdout.strip.to_i
         pid = fork do
-          exec("micron --runproc")
+          exec("bundle exec micron --runclass")
         end
         Process.wait
 
@@ -30,7 +34,6 @@ module Micron
         # puts "exitstatus: #{cmd.exitstatus.inspect}"
 
         data_file = File.join(state_path, "#{pid}.data")
-
         File.open(data_file) do |f|
           while !f.eof
             clazz = Marshal.load(f) # read Clazz from child via file
@@ -54,24 +57,59 @@ module Micron
 
     end # run_all_tests
 
-    def run_proc
-      $0 = "micron:proc_class"
-      ERR.puts "micron: proc class (#{$$})"
-      file = ENV["MICRON_TEST_FILE"]
 
-      test_file = TestFile.new(file)
+    # Child process which runs an entire test file/class
+    def run_class
+      $0 = "micron:proc_run_class"
+      ERR.puts "micron: proc_run_class (#{$$})"
+
+      test_file = TestFile.new(test_filename)
       begin
         test_file.load()
-        results = test_file.run(ForkingClazz)
+        results = test_file.run(ProcClazz)
       rescue Exception => ex
         results = [ex]
       end
 
+      # pass data back to parent process
       data_file = File.join(ENV["MICRON_PATH"], "#{$$}.data")
       File.open(data_file, "w") do |f|
         results.each { |r| Marshal.dump(r, f) }
       end
-      STDOUT.puts $$ # return our pid via stdout (shellout hack)
+
+      # STDOUT.puts $$ # return our pid via stdout (shellout hack)
+    end
+
+    # Child process which runs a single method in a given file & class
+    def run_method
+      $0 = "micron:proc_run_method"
+      ERR.puts "#{$0} (#{$$})"
+
+      test_clazz = ENV["MICRON_TEST_CLASS"]
+      test_method = ENV["MICRON_TEST_METHOD"]
+
+      # ERR.puts "test_clazz: #{test_clazz}"
+      # ERR.puts "test_method: #{test_method}"
+
+      test_file = TestFile.new(test_filename)
+      test_file.load()
+      # load and run a specific method only
+      result = test_file.run_method(test_clazz, test_method, Clazz)
+
+      # pass data back to parent process
+      data_file = File.join(ENV["MICRON_PATH"], "#{$$}.data")
+      File.open(data_file, "w") do |f|
+        Marshal.dump(result, f)
+      end
+
+      # STDOUT.puts $$ # return our pid via stdout (shellout hack)
+    end
+
+
+    private
+
+    def test_filename
+      ENV["MICRON_TEST_FILE"]
     end
 
 

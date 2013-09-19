@@ -21,8 +21,12 @@ module Micron
             options[:proc] = true
           }
 
-          opts.on("--runproc", "Run child process") {
-            options[:runproc] = true
+          opts.on("--runclass", "Run class in child process") {
+            options[:runclass] = true
+          }
+
+          opts.on("--runmethod", "Run method in child process") {
+            options[:runmethod] = true
           }
         end
 

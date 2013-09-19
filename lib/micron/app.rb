@@ -27,9 +27,13 @@ module Micron
       end
 
       # Spawn child runner if called
-      if options[:runproc] then
+      if options[:runclass] then
         require "micron/proc_runner"
-        ProcRunner.new.run_proc
+        ProcRunner.new.run_class
+        exit
+      elsif options[:runmethod] then
+        require "micron/proc_runner"
+        ProcRunner.new.run_method
         exit
       end
 

@@ -16,7 +16,11 @@ module Micron
         return nil
       end
 
-      # Execute the tests in the file
+      # Execute the tests in the file, using the given Clazz
+      #
+      # @param [Clazz] run_clazz
+      #
+      # @return [Array<Object>] array of Clazz and Exception objects
       def run(run_clazz)
 
         results = []
@@ -40,6 +44,21 @@ module Micron
         end
 
         return results
+      end
+
+      # Run the given test method
+      #
+      # @param [String] test_clazz       Name of the TestCase Class
+      # @param [String] test_method      Method name
+      # @param [Clazz] run_clazz         Clazz to run with
+      #
+      # @return [Method]
+      def run_method(test_clazz, test_method, run_clazz)
+        clazz = run_clazz.new(Module.const_get(test_clazz))
+        method = clazz.methods.find{ |m| m.name.to_s == test_method }
+        method.run
+
+        return method
       end
 
     end # TestFile
