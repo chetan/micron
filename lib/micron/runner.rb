@@ -6,6 +6,7 @@ require "micron/runner/clazz"
 require "micron/runner/method"
 require "micron/runner/exception_info"
 
+require "micron/runner/parallel_clazz"
 require "micron/runner/fork_worker"
 require "micron/runner/forking_clazz"
 

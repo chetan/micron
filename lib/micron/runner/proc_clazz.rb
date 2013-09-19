@@ -5,22 +5,7 @@ module Micron
   class Runner
 
     # A Clazz implementation which will fork/exec before running each test method
-    class ProcClazz < Clazz
-
-      def run
-        # spawn tests in separate processes
-        tests = []
-        methods.each do |method|
-          tests << spawn_test(method)
-        end
-
-        # wait for all test methods to return
-        finished = wait_for_tests(tests)
-
-        # collect results
-        @methods = collect_results(finished)
-      end
-
+    class ProcClazz < ParallelClazz
 
       private
 
@@ -40,37 +25,10 @@ module Micron
         }.run
       end
 
-      # Wait for all test processes to complete, rerunning failures if needed
-      def wait_for_tests(tests)
-
-        finished = []
-        while !tests.empty?
-          tests.each do |test|
-            status = test.wait_nonblock
-            if !status.nil?
-              # puts "process #{test.pid} exited with status #{status.to_i}"
-
-              if status.to_i == 0 then
-                finished << tests.delete(test)
-
-              elsif status.to_i == 6 then
-                # segfault/coredump due to coverage
-                # puts "process #{pid} returned error"
-                method = tests.delete(test).context
-                # puts "respawning failed test: #{method.clazz.name}##{method.name}"
-                tests << spawn_test(method)
-
-              end
-            end
-
-            sleep 0.01
-          end
-        end
-
-        return finished
-      end
-
       # Collect the result data
+
+      # Because we fork exec, we can't just read the back from a pipe. Instead,
+      # the child process dumps it to a file and we load it from there.
       #
       # @param [Array] finished       Completed pids & their associated methods
       #
