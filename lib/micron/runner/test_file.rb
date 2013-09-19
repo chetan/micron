@@ -11,6 +11,8 @@ module Micron
       #
       # @throws [Exception] exception, if one was raised during loading
       def load
+        file = @filename
+        EasyCov.filters << lambda { |f| f == file }
         EasyCov.start
         require @filename
         return nil
