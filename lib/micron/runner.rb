@@ -67,7 +67,7 @@ module Micron
         reader, writer = IO.pipe
         pid = fork do
           $0 = "micron: class"
-          ERR.puts "micron: class (#{$$})"
+          # ERR.puts "micron: class (#{$$})"
           reader.close
 
           test_file = TestFile.new(file)

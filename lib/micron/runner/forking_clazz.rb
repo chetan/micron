@@ -10,7 +10,7 @@ module Micron
       def spawn_test(method)
         ForkWorker.new(method) {
           $0 = "micron: method"
-          ERR.puts "#{$0} (#{$$})"
+          # ERR.puts "#{$0} (#{$$})"
 
           EasyCov.start
           method.run

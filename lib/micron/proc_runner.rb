@@ -1,6 +1,4 @@
 
-require "mixlib/shellout"
-
 require "micron/runner/proc_clazz"
 
 module Micron
@@ -12,7 +10,7 @@ module Micron
 
     def run_all_tests
       $0 = "micron: proc_runner"
-      ERR.puts "#{$0} (#{$$})"
+      # ERR.puts "#{$0} (#{$$})"
 
       state_path = ENV["MICRON_PATH"]
       FileUtils.mkdir_p(state_path)
@@ -20,9 +18,6 @@ module Micron
       @files.each do |file|
 
         ENV["MICRON_TEST_FILE"] = file
-        # cmd = Mixlib::ShellOut.new("micron", "--runproc")
-        # cmd.run_command
-        # pid = cmd.stdout.strip.to_i
         pid = fork do
           exec("bundle exec micron --runclass")
         end
@@ -50,9 +45,6 @@ module Micron
         end
         File.delete(data_file)
 
-        # puts "bailing early"
-        # exit
-
       end
 
     end # run_all_tests
@@ -61,7 +53,7 @@ module Micron
     # Child process which runs an entire test file/class
     def run_class
       $0 = "micron:proc_run_class"
-      ERR.puts "micron: proc_run_class (#{$$})"
+      # ERR.puts "micron: proc_run_class (#{$$})"
 
       test_file = TestFile.new(test_filename)
       begin
@@ -76,8 +68,6 @@ module Micron
       File.open(data_file, "w") do |f|
         results.each { |r| Marshal.dump(r, f) }
       end
-
-      # STDOUT.puts $$ # return our pid via stdout (shellout hack)
     end
 
     # Child process which runs a single method in a given file & class
@@ -101,8 +91,6 @@ module Micron
       File.open(data_file, "w") do |f|
         Marshal.dump(result, f)
       end
-
-      # STDOUT.puts $$ # return our pid via stdout (shellout hack)
     end
 
 
