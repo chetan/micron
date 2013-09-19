@@ -49,6 +49,18 @@ module Micron
       return captured_stdout.string, captured_stderr.string
     end
 
+    # Dispose of STDOUT/STDERR
+    #
+    # @param [Array<IO>] out
+    # @param [Array<IO>] err
+    def dispose_io(out, err)
+      STDOUT.reopen out.last
+      out.last.close
+      STDERR.reopen err.last
+      err.last.close
+      STDOUT.sync = STDERR.sync = true
+    end
+
   end # self
   self.backtrace_filter = BacktraceFilter.new # default filter
 

@@ -40,11 +40,7 @@ module Micron
 
           if dispose_output then
             # throw away stdout/err
-            STDOUT.reopen out.last
-            out.last.close
-            STDERR.reopen err.last
-            err.last.close
-            STDOUT.sync = STDERR.sync = true
+            Micron.dispose_io
           end
 
           exec("bundle exec micron --runmethod")
