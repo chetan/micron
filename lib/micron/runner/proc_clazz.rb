@@ -35,18 +35,9 @@ module Micron
         ENV["MICRON_TEST_CLASS"] = method.clazz.name
         ENV["MICRON_TEST_METHOD"] = method.name.to_s
 
-        out, err = IO.pipe, IO.pipe
-        pid = fork do
-
-          if dispose_output then
-            # throw away stdout/err
-            Micron.dispose_io(out, err)
-          end
-
+        ForkWorker.new(method) {
           exec("bundle exec micron --runmethod")
-        end
-
-        { :pid => pid, :method => method }
+        }.run
       end
 
       # Wait for all test processes to complete, rerunning failures if needed
@@ -55,9 +46,9 @@ module Micron
         finished = []
         while !tests.empty?
           tests.each do |test|
-            pid, status = Process.waitpid2(test[:pid], Process::WNOHANG)
+            status = test.wait_nonblock
             if !status.nil?
-              # puts "process #{pid} exited with status #{status.to_i}"
+              # puts "process #{test.pid} exited with status #{status.to_i}"
 
               if status.to_i == 0 then
                 finished << tests.delete(test)
@@ -65,8 +56,7 @@ module Micron
               elsif status.to_i == 6 then
                 # segfault/coredump due to coverage
                 # puts "process #{pid} returned error"
-                test = tests.delete(test)
-                method = test[:method]
+                method = tests.delete(test).context
                 # puts "respawning failed test: #{method.clazz.name}##{method.name}"
                 tests << spawn_test(method)
 
@@ -89,7 +79,7 @@ module Micron
         results = [] # result methods
         finished.each do |test|
 
-          data_file = File.join(ENV["MICRON_PATH"], "#{test[:pid]}.data")
+          data_file = File.join(ENV["MICRON_PATH"], "#{test.pid}.data")
 
           # File is missing if the process crashed (coverage bug)
           # we can always try again, perhaps??
