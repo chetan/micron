@@ -10,8 +10,9 @@ module Micron
       def run
 
         results = [] # result methods
-        methods.each do |method|
+        tests = []
 
+        methods.each do |method|
           # fork/exec once per method, synchronously
           ENV["MICRON_TEST_CLASS"] = method.clazz.name
           ENV["MICRON_TEST_METHOD"] = method.name.to_s
@@ -19,20 +20,27 @@ module Micron
           pid = fork do
             exec("bundle exec micron --runmethod")
           end
-          Process.wait
 
-          # read result method
-          data_file = File.join(ENV["MICRON_PATH"], "#{pid}.data")
+          tests << { :pid => pid, :method => method }
+        end
+
+        Process.waitall # wait for all test methods to return
+
+        # collect results
+        tests.each do |test|
+
+          data_file = File.join(ENV["MICRON_PATH"], "#{test[:pid]}.data")
+
+          # File is missing if the process crashed (coverage bug)
+          # we can always try again, perhaps??
+          next if not File.exists? data_file
+
           File.open(data_file) do |f|
             while !f.eof
               results << Marshal.load(f) # read Method from child via file
             end
           end
           File.delete(data_file)
-
-          # ERR.puts "bailing early for now (after one method)"
-          # break
-
         end
 
         @methods = results
