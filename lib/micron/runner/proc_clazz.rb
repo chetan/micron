@@ -40,7 +40,7 @@ module Micron
 
           if dispose_output then
             # throw away stdout/err
-            Micron.dispose_io
+            Micron.dispose_io(out, err)
           end
 
           exec("bundle exec micron --runmethod")
@@ -62,13 +62,14 @@ module Micron
               if status.to_i == 0 then
                 finished << tests.delete(test)
 
-              else
-                # puts "process #{pid} returned error, forcing unlock"
-                force_unlock(pid)
+              elsif status.to_i == 6 then
+                # segfault/coredump due to coverage
+                # puts "process #{pid} returned error"
                 test = tests.delete(test)
                 method = test[:method]
                 # puts "respawning failed test: #{method.clazz.name}##{method.name}"
                 tests << spawn_test(method)
+
               end
             end
 
@@ -103,50 +104,6 @@ module Micron
         end
 
         return results
-      end
-
-      def force_sweep
-        # puts "sweeping.."
-        %w{coverage .coverage}.each { |cov_dir|
-          file = File.join(Dir.pwd, cov_dir, ".lockfile")
-          next if !File.exists? file
-
-          begin
-            Lockfile.new(file).sweep
-          rescue
-          end
-        }
-      end
-
-      def force_unlock(pid)
-        # puts "force unlocking #{pid}"
-
-        data_file = File.join(ENV["MICRON_PATH"], "#{pid}.data")
-        if File.exists? data_file then
-          begin
-            File.delete(data_file)
-          rescue
-          end
-        end
-
-        %w{coverage .coverage}.each { |cov_dir|
-          file = File.join(Dir.pwd, cov_dir, ".lockfile")
-          next if !File.exists? file
-
-          pidline = File.readlines(file).find { |l| l =~ /^pid:/ }
-          if pid == pidline.split(/:/).last.strip.to_i then
-            # puts "found the pid in the lockfile.. deleting!"
-            begin
-              File.delete(file)
-            rescue
-            end
-          end
-
-          # begin
-          #   Lockfile.new(file).unlock
-          # rescue
-          # end
-        }
       end
 
     end

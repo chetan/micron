@@ -1,10 +1,13 @@
 
 require "micron/runner/backtrace_filter"
+
 require "micron/runner/test_file"
 require "micron/runner/clazz"
-require "micron/runner/forking_clazz"
 require "micron/runner/method"
 require "micron/runner/exception_info"
+
+require "micron/runner/fork_worker"
+require "micron/runner/forking_clazz"
 
 module Micron
 
@@ -59,7 +62,7 @@ module Micron
     def run_all_tests
       @files.each do |file|
 
-        # fork for each process
+        # fork for each file
         reader, writer = IO.pipe
         pid = fork do
           $0 = "micron: class"
