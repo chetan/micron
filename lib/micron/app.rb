@@ -2,13 +2,15 @@
 require "micron"
 require "micron/app/options"
 
+require "fileutils"
+
 module Micron
   class App
 
     def run
       $0 = "micron: runner"
 
-      trap_thread_dump()
+      Micron.trap_thread_dump()
 
       options = Options.parse
 
@@ -20,6 +22,7 @@ module Micron
       # TODO allow setting path/root some other way
       path = File.expand_path(Dir.pwd)
       ENV["MICRON_PATH"] = File.join(path, ".micron")
+      FileUtils.mkdir_p(ENV["MICRON_PATH"])
 
       %w{test .test}.each do |t|
         t = File.join(path, t)
@@ -79,27 +82,6 @@ module Micron
 
       # Write coverage
       SimpleCov::ResultMerger.merged_result.format!
-    end
-
-    # Setup thread dump signal
-    def trap_thread_dump
-      # print a thread dump on SIGALRM
-      # kill -ALRM <pid>
-      Signal.trap 'SIGALRM' do
-        File.open(File.join(ENV["MICRON_PATH"], "#{$$}.threads.txt"), "w+") do |f|
-          f.puts
-          f.puts "=== micron thread dump: #{Time.now} ==="
-          f.puts
-          Thread.list.each do |thread|
-            f.puts "Thread-#{thread.object_id}"
-            f.puts thread.backtrace.join("\n    \\_ ")
-            f.puts "-"
-            f.puts
-          end
-          f.puts "=== end micron thread dump ==="
-          f.puts
-        end
-      end
     end
 
   end
