@@ -1,5 +1,6 @@
 
 require "micron/runner/backtrace_filter"
+require "micron/runner/test_file"
 require "micron/runner/clazz"
 require "micron/runner/forking_clazz"
 require "micron/runner/method"
@@ -11,8 +12,6 @@ module Micron
 
     OUT = $stdout
     ERR = $stderr
-
-    END_OF_STREAM = "end_of_stream"
 
     # these exceptions, if caught while running, will be re-raised
     PASSTHROUGH_EXCEPTIONS = [
@@ -27,11 +26,8 @@ module Micron
     end
 
     def run
-
       run_all_tests()
-      # display_results()
-
-    end # run
+    end
 
 
     def display_results
@@ -63,29 +59,32 @@ module Micron
       @files.each do |file|
 
         # fork for each process
-        r,w = IO.pipe
+        reader, writer = IO.pipe
         pid = fork do
           $0 = "micron: class"
-          load_and_run(file, w)
-          Marshal.dump(END_OF_STREAM, w) # end of stream marker
+          ERR.puts "micron: class (#{$$})"
+          reader.close
+          results = TestFile.new(file).run(writer)
+          results.each { |r| Marshal.dump(r, writer) }
+          writer.close
         end
 
-        Process.wait
-
-        while true
-          clazz = Marshal.load(r) # read Clazz from child via pipe
-          if clazz == END_OF_STREAM then
-            break # got end of stream marker
-
-          elsif clazz.kind_of? Exception then
+        writer.close
+        while !reader.eof
+          clazz = Marshal.load(reader) # read Clazz from child via pipe
+          if clazz.kind_of? Exception then
             puts "Error loading test file: #{file}"
             puts clazz
             puts clazz.backtrace
             exit 1
           end
 
+          # should be a Clazz
           add_result(clazz)
         end
+
+        Process.wait
+
       end
     end
 
@@ -93,35 +92,6 @@ module Micron
     def add_result(clazz)
       @results << clazz
       display_result(clazz)
-    end
-
-    # Load the given test file and run all test classes within
-    def load_and_run(file, w)
-
-      begin
-        EasyCov.start
-        require file
-      rescue => ex
-        Marshal.dump(ex, w)
-        return
-      end
-
-      TestCase.subclasses.each do |clazz|
-        # should really only be one per file..
-        begin
-          # clazz = Clazz.new(clazz)
-          clazz = ForkingClazz.new(clazz)
-          if !clazz.methods.empty? then
-            clazz.run
-            Marshal.dump(clazz, w) # pass Clazz back to parent via pipe
-          end
-
-        rescue Exception => ex
-          # Error with the test class itself
-          Marshal.dump(ex, w)
-          return
-        end
-      end
     end
 
   end

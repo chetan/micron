@@ -8,8 +8,10 @@ module Micron
     class ForkingClazz < Clazz
 
       def run
-        results = Parallel.map(methods, :in_processes => 8) do |method|
+        results = Parallel.map(methods, :in_processes => Parallel.processor_count) do |method|
           $0 = "micron: method"
+          ERR.puts "micron: method (#{$$})"
+
           EasyCov.start
           method.run
           method
