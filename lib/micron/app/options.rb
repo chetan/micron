@@ -16,6 +16,14 @@ module Micron
           opts.on("--nocov", "Disable coverage reporting") {
             options[:coverage] = false
           }
+
+          opts.on("--proc", "Use process runner") {
+            options[:proc] = true
+          }
+
+          opts.on("--runproc", "Run child process") {
+            options[:runproc] = true
+          }
         end
 
         begin

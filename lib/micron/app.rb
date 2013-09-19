@@ -8,6 +8,8 @@ module Micron
     def run
       $0 = "micron: runner"
 
+      trap_thread_dump()
+
       options = Options.parse
 
       if !options[:coverage] then
@@ -15,11 +17,20 @@ module Micron
       end
 
       # Setup paths
+      # TODO allow setting path/root some other way
       path = File.expand_path(Dir.pwd)
+      ENV["MICRON_PATH"] = File.join(path, ".micron")
 
       %w{test .test}.each do |t|
         t = File.join(path, t)
         $: << t if File.directory?(t)
+      end
+
+      # Spawn child runner if called
+      if options[:runproc] then
+        require "micron/proc_runner"
+        ProcRunner.new.run_proc
+        exit
       end
 
       # Find tests to run
@@ -40,7 +51,12 @@ module Micron
       end
 
       # Run tests
-      Micron::Runner.new(files).run
+      if options[:proc] then
+        require "micron/proc_runner"
+        Micron::ProcRunner.new(files).run
+      else
+        Micron::Runner.new(files).run
+      end
 
       # coverage report
       if options[:coverage] then
@@ -59,6 +75,27 @@ module Micron
 
       # Write coverage
       SimpleCov::ResultMerger.merged_result.format!
+    end
+
+    # Setup thread dump signal
+    def trap_thread_dump
+      # print a thread dump on SIGALRM
+      # kill -ALRM <pid>
+      Signal.trap 'SIGALRM' do
+        File.open(File.join(ENV["MICRON_PATH"], "#{$$}.threads.txt"), "w+") do |f|
+          f.puts
+          f.puts "=== micron thread dump: #{Time.now} ==="
+          f.puts
+          Thread.list.each do |thread|
+            f.puts "Thread-#{thread.object_id}"
+            f.puts thread.backtrace.join("\n    \\_ ")
+            f.puts "-"
+            f.puts
+          end
+          f.puts "=== end micron thread dump ==="
+          f.puts
+        end
+      end
     end
 
   end

@@ -8,6 +8,7 @@ require "micron/runner/exception_info"
 
 module Micron
 
+  # Default Runner - forks for each file
   class Runner
 
     OUT = $stdout
@@ -64,7 +65,7 @@ module Micron
           $0 = "micron: class"
           ERR.puts "micron: class (#{$$})"
           reader.close
-          results = TestFile.new(file).run(writer)
+          results = TestFile.new(file).run()
           results.each { |r| Marshal.dump(r, writer) }
           writer.close
         end

@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chetan Sarva"]
-  s.date = "2013-09-18"
+  s.date = "2013-09-19"
   s.description = "An extremely minimal unit test library for Ruby"
   s.email = "chetan@pixelcop.net"
   s.executables = ["micron"]
@@ -22,13 +22,17 @@ Gem::Specification.new do |s|
     "bin/micron",
     "lib/micron.rb",
     "lib/micron/app.rb",
+    "lib/micron/app/options.rb",
     "lib/micron/assertion.rb",
     "lib/micron/minitest.rb",
+    "lib/micron/proc_runner.rb",
     "lib/micron/runner.rb",
     "lib/micron/runner/backtrace_filter.rb",
     "lib/micron/runner/clazz.rb",
+    "lib/micron/runner/exception_info.rb",
     "lib/micron/runner/forking_clazz.rb",
     "lib/micron/runner/method.rb",
+    "lib/micron/runner/test_file.rb",
     "lib/micron/test_case.rb",
     "lib/micron/test_case/assertions.rb",
     "lib/micron/test_case/lifecycle_hooks.rb",
@@ -47,6 +51,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<easycov>, [">= 0"])
       s.add_runtime_dependency(%q<parallel>, [">= 0"])
       s.add_runtime_dependency(%q<hitimes>, [">= 0"])
+      s.add_runtime_dependency(%q<mixlib-shellout>, [">= 0"])
       s.add_development_dependency(%q<yard>, ["~> 0.8"])
       s.add_development_dependency(%q<bundler>, ["~> 1.1"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
@@ -55,6 +60,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<easycov>, [">= 0"])
       s.add_dependency(%q<parallel>, [">= 0"])
       s.add_dependency(%q<hitimes>, [">= 0"])
+      s.add_dependency(%q<mixlib-shellout>, [">= 0"])
       s.add_dependency(%q<yard>, ["~> 0.8"])
       s.add_dependency(%q<bundler>, ["~> 1.1"])
       s.add_dependency(%q<jeweler>, [">= 0"])
@@ -64,6 +70,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<easycov>, [">= 0"])
     s.add_dependency(%q<parallel>, [">= 0"])
     s.add_dependency(%q<hitimes>, [">= 0"])
+    s.add_dependency(%q<mixlib-shellout>, [">= 0"])
     s.add_dependency(%q<yard>, ["~> 0.8"])
     s.add_dependency(%q<bundler>, ["~> 1.1"])
     s.add_dependency(%q<jeweler>, [">= 0"])

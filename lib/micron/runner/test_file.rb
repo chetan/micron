@@ -8,7 +8,7 @@ module Micron
       end
 
       # Execute the tests in the file
-      def run(writer)
+      def run
 
         results = []
 
