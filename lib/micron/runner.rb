@@ -64,11 +64,9 @@ module Micron
       @files.each do |file|
 
         # fork for each file
-        reader, writer = IO.pipe
-        pid = fork do
+        worker = ForkWorker.new {
           $0 = "micron: class"
           # ERR.puts "micron: class (#{$$})"
-          reader.close
 
           test_file = TestFile.new(file)
           begin
@@ -78,13 +76,11 @@ module Micron
             results = [ex]
           end
 
-          results.each { |r| Marshal.dump(r, writer) }
-          writer.close
-        end
+          results
+        }.run
 
-        writer.close
-        while !reader.eof
-          clazz = Marshal.load(reader) # read Clazz from child via pipe
+        results = worker.wait.result
+        results.each do |clazz|
           if clazz.kind_of? Exception then
             puts "Error loading test file: #{file}"
             puts clazz
@@ -95,8 +91,6 @@ module Micron
           # should be a Clazz
           add_result(clazz)
         end
-
-        Process.wait
 
       end
     end
