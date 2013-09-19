@@ -13,6 +13,7 @@ module Micron
     end
 
     def teardown
+      EasyCov.checkpoint
     end
 
 
