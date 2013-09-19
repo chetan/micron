@@ -25,11 +25,17 @@ module Micron
             pid, status = Process.waitpid2(test[:pid], Process::WNOHANG)
             if !status.nil?
               puts "process #{pid} exited with status #{status.to_i}"
-              finished << tests.delete(test)
 
-              if status.to_i != 0 then
+              if status.to_i == 0 then
+                finished << tests.delete(test)
+
+              else
                 puts "process returned error, forcing unlock"
                 force_unlock(pid)
+                test = tests.delete(test)
+                method = test[:method]
+                puts "respawning failed test: #{method.clazz.name}##{method.name}"
+                tests << spawn_test(method)
               end
             end
 
