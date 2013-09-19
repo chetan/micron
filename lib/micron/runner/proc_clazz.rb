@@ -8,33 +8,70 @@ module Micron
     class ProcClazz < Clazz
 
       def run
-
-        results = [] # result methods
-        tests = []
-
         # spawn tests in separate processes
+        tests = []
         methods.each do |method|
           tests << spawn_test(method)
         end
 
-
         # wait for all test methods to return
+        finished = wait_for_tests(tests)
+
+        # collect results
+        @methods = collect_results(finished)
+      end
+
+
+      private
+
+      # Spawn a process for the given method
+      #
+      # @param [Method] method
+      # @param [Boolean] dispose_output       If true, throw away stdout/stderr (default: true)
+      #
+      # @return [Hash]
+      def spawn_test(method, dispose_output=true)
+        # fork/exec once per method, synchronously
+        ENV["MICRON_TEST_CLASS"] = method.clazz.name
+        ENV["MICRON_TEST_METHOD"] = method.name.to_s
+
+        out, err = IO.pipe, IO.pipe
+        pid = fork do
+
+          if dispose_output then
+            # throw away stdout/err
+            STDOUT.reopen out.last
+            out.last.close
+            STDERR.reopen err.last
+            err.last.close
+            STDOUT.sync = STDERR.sync = true
+          end
+
+          exec("bundle exec micron --runmethod")
+        end
+
+        { :pid => pid, :method => method }
+      end
+
+      # Wait for all test processes to complete, rerunning failures if needed
+      def wait_for_tests(tests)
+
         finished = []
         while !tests.empty?
           tests.each do |test|
             pid, status = Process.waitpid2(test[:pid], Process::WNOHANG)
             if !status.nil?
-              puts "process #{pid} exited with status #{status.to_i}"
+              # puts "process #{pid} exited with status #{status.to_i}"
 
               if status.to_i == 0 then
                 finished << tests.delete(test)
 
               else
-                puts "process returned error, forcing unlock"
+                # puts "process #{pid} returned error, forcing unlock"
                 force_unlock(pid)
                 test = tests.delete(test)
                 method = test[:method]
-                puts "respawning failed test: #{method.clazz.name}##{method.name}"
+                # puts "respawning failed test: #{method.clazz.name}##{method.name}"
                 tests << spawn_test(method)
               end
             end
@@ -43,11 +80,16 @@ module Micron
           end
         end
 
-        # make sure all locks are cleared, in case there were any errors/coredumps
-        # force_sweep()
-        # force_unlock()
+        return finished
+      end
 
-        # collect results
+      # Collect the result data
+      #
+      # @param [Array] finished       Completed pids & their associated methods
+      #
+      # @return [Array<Method>]
+      def collect_results(finished)
+        results = [] # result methods
         finished.each do |test|
 
           data_file = File.join(ENV["MICRON_PATH"], "#{test[:pid]}.data")
@@ -64,33 +106,11 @@ module Micron
           File.delete(data_file)
         end
 
-        @methods = results
-      end
-
-
-      private
-
-      def spawn_test(method)
-        # fork/exec once per method, synchronously
-        ENV["MICRON_TEST_CLASS"] = method.clazz.name
-        ENV["MICRON_TEST_METHOD"] = method.name.to_s
-
-        out, err = IO.pipe, IO.pipe
-        pid = fork do
-          # throw away stdout/err
-          STDOUT.reopen out.last
-          out.last.close
-          STDERR.reopen err.last
-          err.last.close
-          STDOUT.sync = STDERR.sync = true
-          exec("bundle exec micron --runmethod")
-        end
-
-        { :pid => pid, :method => method }
+        return results
       end
 
       def force_sweep
-        puts "sweeping.."
+        # puts "sweeping.."
         %w{coverage .coverage}.each { |cov_dir|
           file = File.join(Dir.pwd, cov_dir, ".lockfile")
           next if !File.exists? file
@@ -103,7 +123,15 @@ module Micron
       end
 
       def force_unlock(pid)
-        puts "force unlocking #{pid}"
+        # puts "force unlocking #{pid}"
+
+        data_file = File.join(ENV["MICRON_PATH"], "#{pid}.data")
+        if File.exists? data_file then
+          begin
+            File.delete(data_file)
+          rescue
+          end
+        end
 
         %w{coverage .coverage}.each { |cov_dir|
           file = File.join(Dir.pwd, cov_dir, ".lockfile")
@@ -111,8 +139,11 @@ module Micron
 
           pidline = File.readlines(file).find { |l| l =~ /^pid:/ }
           if pid == pidline.split(/:/).last.strip.to_i then
-            puts "found the pid in the lockfile.. deleting!"
-            File.delete(file)
+            # puts "found the pid in the lockfile.. deleting!"
+            begin
+              File.delete(file)
+            rescue
+            end
           end
 
           # begin
