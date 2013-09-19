@@ -65,7 +65,15 @@ module Micron
           $0 = "micron: class"
           ERR.puts "micron: class (#{$$})"
           reader.close
-          results = TestFile.new(file).run()
+
+          test_file = TestFile.new(file)
+          begin
+            test_file.load()
+            results = test_file.run(ForkingClazz)
+          rescue Exception => ex
+            results = [ex]
+          end
+
           results.each { |r| Marshal.dump(r, writer) }
           writer.close
         end

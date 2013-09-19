@@ -58,7 +58,15 @@ module Micron
       $0 = "micron:proc_class"
       ERR.puts "micron: proc class (#{$$})"
       file = ENV["MICRON_TEST_FILE"]
-      results = TestFile.new(file).run()
+
+      test_file = TestFile.new(file)
+      begin
+        test_file.load()
+        results = test_file.run(ForkingClazz)
+      rescue Exception => ex
+        results = [ex]
+      end
+
       data_file = File.join(ENV["MICRON_PATH"], "#{$$}.data")
       File.open(data_file, "w") do |f|
         results.each { |r| Marshal.dump(r, f) }

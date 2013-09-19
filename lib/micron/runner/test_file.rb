@@ -7,28 +7,30 @@ module Micron
         @filename = filename
       end
 
+      # Load the test file
+      #
+      # @throws [Exception] exception, if one was raised during loading
+      def load
+        EasyCov.start
+        require @filename
+        return nil
+      end
+
       # Execute the tests in the file
-      def run
+      def run(run_clazz)
 
         results = []
 
-        begin
-          EasyCov.start
-          require @filename
-        rescue => ex
-          results << ex
-          return results
-        end
-
-        TestCase.subclasses.each do |clazz|
+        TestCase.subclasses.each do |test_clazz|
           # should really only be one per file..
           begin
-            # clazz = Clazz.new(clazz)
-            clazz = ForkingClazz.new(clazz)
-            if !clazz.methods.empty? then
-              clazz.run
-              results << clazz
+            clazz = run_clazz.new(test_clazz)
+            if clazz.methods.empty? then
+              next
             end
+
+            clazz.run
+            results << clazz
 
           rescue Exception => ex
             # Error with loading the test class itself
