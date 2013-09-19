@@ -65,7 +65,7 @@ module Micron
 
       test_file = TestFile.new(test_filename)
       begin
-        test_file.load()
+        test_file.load(false)
         results = test_file.run(ProcClazz)
       rescue Exception => ex
         results = [ex]

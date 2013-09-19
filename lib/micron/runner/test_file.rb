@@ -10,10 +10,12 @@ module Micron
       # Load the test file
       #
       # @throws [Exception] exception, if one was raised during loading
-      def load
-        file = @filename
-        EasyCov.filters << lambda { |f| f == file }
-        EasyCov.start
+      def load(coverage = true)
+        if coverage then
+          file = @filename
+          EasyCov.filters << lambda { |f| f == file }
+          EasyCov.start
+        end
         require @filename
         return nil
       end
