@@ -17,10 +17,11 @@ module Micron
 
       attr_reader :pid, :context
 
-      def initialize(context=nil, &block)
-        @context = context
-        @block = block
-        @done = false
+      def initialize(context=nil, capture_io=true, &block)
+        @context    = context
+        @capture_io = capture_io
+        @block      = block
+        @done       = false
       end
 
       def run
@@ -36,10 +37,12 @@ module Micron
           @err.first.close
           @parent_read.close
 
-          # redirect io
-          STDOUT.reopen @out.last
-          STDERR.reopen @err.last
-          STDOUT.sync = STDERR.sync = true
+          if @capture_io
+            # redirect io
+            STDOUT.reopen @out.last
+            STDERR.reopen @err.last
+            STDOUT.sync = STDERR.sync = true
+          end
 
           # run
           ret = @block.call()
@@ -71,6 +74,15 @@ module Micron
         # $0 = old0
         @done = true
         self
+      end
+
+      # Blocking wait for process to finish
+      #
+      # @return [Process::Status]
+      def wait2
+        pid, status = Process.wait2(@pid)
+        @done = true
+        return status
       end
 
       # Non-blocking wait for process to finish
