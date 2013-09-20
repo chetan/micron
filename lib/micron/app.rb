@@ -9,6 +9,7 @@ module Micron
 
     def run
       $0 = "micron: runner"
+      Thread.current[:name] = "main thread"
 
       Micron.trap_thread_dump()
 
