@@ -15,6 +15,8 @@ module Micron
     #
     class ForkWorker
 
+      CHUNK_SIZE = 1024 * 16
+
       attr_reader :pid, :context
 
       def initialize(context=nil, capture_io=true, &block)
@@ -119,6 +121,14 @@ module Micron
         @err.first.close
         @stderr ||= ""
         @stderr
+      end
+
+      def out
+        @out.first
+      end
+
+      def err
+        @err.first
       end
 
     end
