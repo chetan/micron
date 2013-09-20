@@ -82,22 +82,30 @@ module Micron
             hang_watchers << Thread.new(test) { |test|
 
               Thread.current[:name] = "hang_watcher: #{test.pid}"
-              # puts "watching #{test.pid} for hangs"
+              puts "watching #{test.pid} for hangs"
 
               err = 0
+              sel = 0
               open = false
               while true
 
                 begin
 
                   if err > 10 then # should wait about 3 sec for the proc to exit
-                    # puts "Unleash the reaper!! #{test.pid}"
+                    puts "Unleash the reaper!! #{test.pid}"
                     Process.kill(9, test.pid)
                     break
                   end
 
                   if !open then
-                    if IO.select([test.err], nil, nil, 0.1).nil? then
+                    if IO.select([test.err], nil, nil, 1).nil? then
+                      sel += 1
+                      if sel > 10 then
+                        # thread dead??
+                        puts "not ready yet?! Unleash the reaper!! #{test.pid}"
+                        Process.kill(9, test.pid)
+                        break
+                      end
                       err += 1 if err > 0
                       Thread.pass
                       next
@@ -111,18 +119,18 @@ module Micron
                     (str.include?("malloc: *** error for object") ||
                      str.include?("[BUG] Segmentation fault")) then
 
-                    # puts "looks like we got an error in test #{test.pid}"
+                    puts "looks like we got an error in test #{test.pid}"
                     # puts str
                     err = 1
                   end
 
                 rescue EOFError
-                  # puts "caught EOFError for thread #{test.pid}"
+                  puts "caught EOFError for thread #{test.pid}"
                   err = 1
                   # see if it exited
                   if test.wait_nonblock then
                     # exited, we're all good..
-                    # puts "hang watcher exiting since it looks like process exited also"
+                    puts "hang watcher exiting since it looks like process exited also"
                     break
                   end
 
@@ -132,9 +140,9 @@ module Micron
                   next
 
                 rescue Exception => ex
-                  # puts "caught another ex?!"
-                  # puts ex.inspect
-                  # ptus ex.backtrace
+                  puts "caught another ex?!"
+                  puts ex.inspect
+                  ptus ex.backtrace
                   err = 1
 
                 end
@@ -147,7 +155,7 @@ module Micron
               end
 
               hang_watchers.delete(Thread.current)
-              # puts "hang_watcher thread exiting"
+              puts "hang_watcher thread exiting #{test.pid}"
             }
 
           end
