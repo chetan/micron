@@ -1,4 +1,6 @@
 
+require "thwait"
+
 module Micron
   class Runner
 
@@ -25,39 +27,62 @@ module Micron
       # Wait for all test processes to complete, rerunning failures if needed
       def wait_for_tests(tests)
 
+        # OUT.puts "waiting for tests"
+
         finished = []
-        while !tests.empty?
-          tests.each do |test|
-            status = test.wait_nonblock
-            if !status.nil?
-              # puts "process #{test.pid} exited with status #{status.to_i}"
+        watchers = []
 
-              if status.to_i == 0 then
-                finished << tests.delete(test)
+        test_queue = Queue.new
+        tests.each { |t| test_queue.push(t) }
 
-              elsif status.to_i == 6 then
+        meta_watcher = Thread.new {
+          # thread which will make sure we're watching all tests, including
+          # any that get respawned
+
+          while true
+            test = test_queue.pop # blocking
+            # puts "creating new watcher for #{test.pid}"
+
+            watchers << Thread.new(test) { |test|
+              # puts "new thread watching test #{test.pid}"
+              status = test.wait2.to_i
+              # puts "process #{test.pid} exited with status #{status}"
+
+              if status == 0 then
+                finished << test
+
+              elsif status == 6 || status == 4 then
                 # segfault/coredump due to coverage
-                # puts "process #{pid} returned error"
-                method = tests.delete(test).context
-                # puts "respawning failed test: #{method.clazz.name}##{method.name}"
-                tests << spawn_test(method)
+                # puts "process #{test.pid} returned error"
+                method = test.context
+                test_queue << spawn_test(method) # new watcher thread will be spawned
+                # puts "respawned failed test: #{method.clazz.name}##{method.name}"
 
               else
                 puts
-                puts "== UNKONWN ERROR! =="
-                puts "STATUS: #{status.to_i}"
-                puts "STDOUT:"
-                p f.stdout
+                puts "== UNKNOWN ERROR! =="
+                puts "STATUS: #{status}"
                 puts "STDERR:"
-                p f.stderr
+                puts f.stderr
+                puts "STDOUT:"
+                puts f.stdout
                 exit 3
 
               end
-            end
 
-            sleep 0.01
+              # puts "deleting watcher thread for test #{test.pid}"
+              watchers.delete(Thread.current)
+            }
+
           end
+
+          # puts "meta_watcher exiting"
+        }
+
+        while !watchers.empty? || !test_queue.empty?
+          ThreadsWait.all_waits(*watchers)
         end
+        meta_watcher.kill
 
         return finished
       end
