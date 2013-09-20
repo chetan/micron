@@ -71,7 +71,7 @@ module Micron
           f.puts "=== micron thread dump: #{Time.now} ==="
           f.puts
           Thread.list.each do |thread|
-            f.puts "Thread-#{thread.object_id}"
+            f.puts "Thread-#{thread.object_id}" + (thread[:name] ? ": " + thread[:name] : "")
             f.puts thread.backtrace.join("\n    \\_ ")
             f.puts "-"
             f.puts
