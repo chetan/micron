@@ -2,9 +2,7 @@ source "https://rubygems.org"
 
 gem "easycov", :github => "chetan/easycov"
 
-gem "parallel"
 gem "hitimes"
-gem "mixlib-shellout"
 
 group :development do
   gem "yard", "~> 0.8"

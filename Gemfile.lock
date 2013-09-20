@@ -46,7 +46,6 @@ GEM
       multi_json (>= 1.5)
     lockfile (2.1.0)
     minitest (4.7.5)
-    mixlib-shellout (1.2.0)
     multi_json (1.8.0)
     multi_xml (0.5.5)
     multipart-post (1.2.0)
@@ -58,7 +57,6 @@ GEM
       multi_json (~> 1.0)
       multi_xml (~> 0.5)
       rack (~> 1.2)
-    parallel (0.8.2)
     rack (1.5.2)
     rake (10.1.0)
     rdoc (4.0.1)
@@ -78,6 +76,4 @@ DEPENDENCIES
   hitimes
   jeweler!
   minitest (~> 4.0)
-  mixlib-shellout
-  parallel
   yard (~> 0.8)
