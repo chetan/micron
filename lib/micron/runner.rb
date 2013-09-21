@@ -1,5 +1,6 @@
 
 require "micron/runner/backtrace_filter"
+require "micron/runner/debug"
 
 require "micron/runner/test_file"
 require "micron/runner/clazz"

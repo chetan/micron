@@ -5,7 +5,7 @@ module Micron
 
       def debug(str)
 
-        @@mutex ||= Mutex.new
+        return
 
         name = Thread.current[:name] || ""
         if !name.empty? then
@@ -14,9 +14,7 @@ module Micron
           name = "[#{$$}]"
         end
 
-        @@mutex.synchronize {
-          puts "#{name} #{str}"
-        }
+        puts "#{name} #{str}"
       end
 
     end
