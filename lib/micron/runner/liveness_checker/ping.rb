@@ -21,20 +21,25 @@ module Micron
               writer.sync = true
 
               while true
-                writer.puts "ping"
-                debug "sent ping"
-
                 begin
+                  writer.puts "ping"
+                  debug "sent ping"
 
                   reply = Timeout.timeout(0.1) { reader.readline }
 
                   if "pong\n" == reply then
                     last_pong = Hitimes::Interval.now
-                    debug "got a pong before timeout"
+                    debug "got pong response"
                   end
 
                 rescue Exception => ex
-                  debug "no pong received"
+                  if worker.wait_nonblock then
+                    # process exited, no need to do anything more
+                    # debug "no pong in #{last_pong.to_f} sec, but process exited"
+                    break
+                  end
+
+                  debug "no pong received: #{Micron.dump_ex(ex)}"
                   if last_pong.to_f > 5.0 then
                     debug "no pong in #{last_pong.to_f} sec! Unleash the reaper!!"
                     Process.kill(9, worker.pid)
@@ -43,7 +48,7 @@ module Micron
                 end
 
                 sleep 0.1
-              end
+              end # while
 
             rescue => ex
               debug "caught: #{Micron.dump_ex(ex)}"

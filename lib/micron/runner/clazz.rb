@@ -3,6 +3,8 @@ module Micron
   class Runner
     class Clazz
 
+      include Debug
+
       attr_reader :name, :methods
 
       def initialize(clazz)

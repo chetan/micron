@@ -21,7 +21,7 @@ module Micron
 
       CHUNK_SIZE = 1024 * 16
 
-      attr_reader :pid, :context
+      attr_reader :pid, :context, :status
 
       def initialize(context=nil, capture_io=true, &block)
         @context    = context
@@ -39,6 +39,7 @@ module Micron
 
         @pid = fork do
 
+          Thread.current[:name] = "worker"
           Micron.trap_thread_dump()
 
           # close unused readers in child
@@ -50,8 +51,8 @@ module Micron
             # redirect io
             STDOUT.reopen @out.last
             STDERR.reopen @err.last
-            STDOUT.sync = STDERR.sync = true
           end
+          STDOUT.sync = STDERR.sync = true
 
           clean_parent_file_descriptors()
 
@@ -87,11 +88,12 @@ module Micron
       #
       # @return [self]
       def wait
-        # old0 = $0
-        # $0 = "#{$0} (waiting for #{@pid})"
+        return self if @done
+
         Process.wait(@pid)
-        # $0 = old0
         @done = true
+        @status = $?
+        @liveness_checker.stop if @liveness_checker
         self
       end
 
@@ -99,20 +101,26 @@ module Micron
       #
       # @return [Process::Status]
       def wait2
-        pid, status = Process.wait2(@pid)
+        return @status if @done
+
+        pid, @status = Process.wait2(@pid)
         @done = true
-        return status
+        @liveness_checker.stop if @liveness_checker
+        return @status
       end
 
       # Non-blocking wait for process to finish
       #
       # @return [Process::Status] nil if not yet complete
       def wait_nonblock
-        pid, status = Process.waitpid2(@pid, Process::WNOHANG)
-        if !status.nil? then
+        return @status if @done
+
+        pid, @status = Process.waitpid2(@pid, Process::WNOHANG)
+        if !@status.nil? then
           @done = true
+          @liveness_checker.stop if @liveness_checker
         end
-        return status
+        return @status
       end
 
       def result

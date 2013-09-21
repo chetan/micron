@@ -12,6 +12,7 @@ module Micron
       def run
         # spawn tests in separate processes
         tests = []
+        debug "spawning #{methods.size} methods"
         methods.each do |method|
           tests << spawn_test(method)
         end
@@ -21,6 +22,7 @@ module Micron
 
         # collect results
         @methods = collect_results(finished)
+        debug "collected #{@methods.size} methods"
       end
 
 
@@ -45,54 +47,68 @@ module Micron
 
           while true
             test = test_queue.pop # blocking
-            # puts "creating new watcher for #{test.pid}"
+            debug "creating watcher for #{test.pid}"
 
             watchers << Thread.new(test) { |test|
-              Thread.current[:name] = "watcher: #{test.pid}"
-              # puts "new thread watching test #{test.pid}"
-              status = test.wait2.to_i
-              # puts "process #{test.pid} exited with status #{status}"
+              Thread.current[:name] = "watcher-#{test.pid}"
+              debug "start"
 
-              if status == 0 then
-                finished << test
+              while true
+                begin
+                  status = test.wait2.to_i
+                  # puts "process #{test.pid} exited with status #{status}"
 
-              elsif status == 6 || status == 4 || status == 9 then
-                # segfault/coredump due to coverage
-                # puts "process #{test.pid} returned error"
-                method = test.context
-                test_queue << spawn_test(method) # new watcher thread will be spawned
-                # puts "respawned failed test: #{method.clazz.name}##{method.name}"
+                  if status == 0 then
+                    finished << test
 
-              else
-                puts
-                puts "== UNKNOWN ERROR! =="
-                puts "STATUS: #{status}"
-                puts "STDERR:"
-                puts f.stderr
-                puts "STDOUT:"
-                puts f.stdout
-                exit 3
+                  elsif status == 6 || status == 4 || status == 9 then
+                    # segfault/coredump due to coverage
+                    # puts "process #{test.pid} returned error"
+                    method = test.context
+                    test_queue << spawn_test(method) # new watcher thread will be spawned
+                    debug "respawned failed test: #{method.clazz.name}##{method.name}"
 
+                  else
+                    puts
+                    puts "== UNKNOWN ERROR! =="
+                    puts "STATUS: #{status}"
+                    puts "STDERR:"
+                    puts f.stderr
+                    puts "STDOUT:"
+                    puts f.stdout
+                    exit 3
+
+                  end
+
+                rescue Errno::ECHILD
+                  debug "retrying wait2"
+                  next # retry - should get cached status
+
+                rescue Exception => ex
+                  debug "caught: #{Micron.dump_ex(ex)}"
+                end
+
+                break # break loop by default
               end
 
-              # puts "deleting watcher thread for test #{test.pid}"
+
+              debug "exit thread"
               watchers.delete(Thread.current)
             }
 
             # create another thread to make sure the process didn't hang after
             # throwing an error on stderr
             hang_watchers << ProcessReaper.create(test)
-
           end
 
-          # puts "meta_watcher exiting"
+          debug "exiting"
         }
 
         while !watchers.empty? || !test_queue.empty?
           watchers.reject!{ |w| !w.alive? } # prune dead threads
           ThreadsWait.all_waits(*watchers)
         end
-        # puts "all watcher threads finished"
+        debug "all watcher threads finished for #{self.name}"
         meta_watcher.kill
         hang_watchers.each{ |t| t.kill }
 
