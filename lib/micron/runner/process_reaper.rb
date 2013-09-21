@@ -3,11 +3,13 @@ module Micron
   class Runner
     class ProcessReaper
 
+      extend Debug
+
       def self.create(test)
         Thread.new(test) { |test|
 
-          Thread.current[:name] = "hang_watcher: #{test.pid}"
-          # puts "watching #{test.pid} for hangs"
+          Thread.current[:name] = "reaper-#{test.pid}"
+          debug "started"
 
           err = 0
           sel = 0
@@ -22,7 +24,7 @@ module Micron
             begin
 
               if err > 10 then # should wait about 3 sec for the proc to exit
-                puts "Unleash the reaper!! #{test.pid}"
+                debug "Unleash the reaper!!"
                 Process.kill(9, test.pid)
                 break
               end
@@ -30,49 +32,50 @@ module Micron
               if !open then
                 if IO.select([test.err], nil, nil, 1).nil? then
                   sel += 1
+                  debug "select = #{sel}"
                   # if sel > 3 then
                   #   # thread dead??
-                  #   puts "not ready yet?! Unleash the reaper!! #{test.pid}"
+                  #   debug "not ready yet?! Unleash the reaper!! #{test.pid}"
                   #   Process.kill(9, test.pid)
                   #   break
                   # end
                   err += 1 if err > 0
+                  debug "err = #{err}"
                   Thread.pass
                   next
                 end
+                debug "opened err io"
                 open = true
               end
 
               str = test.err.read_nonblock(1024*16)
-              p str if !str.nil?
+              debug str if !str.nil?
               if !str.nil? &&
                 (str.include?("malloc: *** error for object") ||
-                 str.include?("[BUG] Segmentation fault")) then
+                 str.include?("Segmentation fault")) then
 
-                puts "looks like we got an error in test #{test.pid}"
-                # puts str
+                debug "looks like we got an error"
                 err = 1
               end
 
             rescue EOFError
-              puts "caught EOFError for thread #{test.pid}"
+              debug "caught EOFError"
               err = 1
               # see if it exited
               if test.wait_nonblock then
                 # exited, we're all good..
-                puts "hang watcher exiting since it looks like process exited also"
+                debug "hang watcher exiting since it looks like process exited also"
                 break
               end
 
             rescue Errno::EWOULDBLOCK
-              # puts "would block?!"
+              # debug "would block?!"
               open = false
               next
 
             rescue Exception => ex
-              puts "caught another ex?!"
-              puts ex.inspect
-              ptus ex.backtrace
+              debug "caught another ex?!"
+              debug Micron.dump_ex(ex, true)
               err = 1
 
             end
@@ -84,8 +87,8 @@ module Micron
 
           end
 
-          hang_watchers.delete(Thread.current)
-          puts "hang_watcher thread exiting #{test.pid}"
+          reapers.delete(Thread.current)
+          debug "thread exiting"
         }
 
       end
