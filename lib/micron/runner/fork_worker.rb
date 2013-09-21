@@ -29,6 +29,7 @@ module Micron
       def run
         @out, @err = IO.pipe, IO.pipe
         @parent_read, @child_write = IO.pipe
+        @child_write.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
 
         @pid = fork do
 
@@ -46,11 +47,14 @@ module Micron
             STDOUT.sync = STDERR.sync = true
           end
 
+          clean_parent_file_descriptors()
+
           # run
           ret = @block.call()
 
           # Pass result to parent via pipe
           Marshal.dump(ret, @child_write)
+          @child_write.flush
 
           # cleanup
           @out.last.close
@@ -130,6 +134,35 @@ module Micron
       def err
         @err.first
       end
+
+
+      private
+
+      # When a new process is started with chef, it shares the file
+      # descriptors of the parent. We clean the file descriptors
+      # coming from the parent to prevent unintended locking if parent
+      # is killed.
+      # NOTE: After some discussions we've decided to iterate on file
+      # descriptors upto 256. We believe this  is a reasonable upper
+      # limit in a chef environment. If we have issues in the future this
+      # number could be made to be configurable or updated based on
+      # the ulimit based on platform.
+      def clean_parent_file_descriptors
+        # Don't clean $stdin, $stdout, $stderr, process_status_pipe.
+        3.upto(256) do |n|
+          # We are checking the fd for error pipe before attempting to
+          # create a file because error pipe will auto close when we
+          # try to create a file since it's set to CLOEXEC.
+          if n != @child_write.to_i && n != @out.last.to_i && n != @err.last.to_i
+            begin
+              fd = File.for_fd(n)
+              fd.close if fd
+            rescue
+            end
+          end
+        end
+      end
+
 
     end
   end
