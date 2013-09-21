@@ -1,4 +1,6 @@
 
+require "micron/runner/liveness_checker"
+
 module Micron
   class Runner
 
@@ -15,6 +17,8 @@ module Micron
     #
     class ForkWorker
 
+      include Debug
+
       CHUNK_SIZE = 1024 * 16
 
       attr_reader :pid, :context
@@ -26,10 +30,12 @@ module Micron
         @done       = false
       end
 
-      def run
+      def run(check_liveness=false)
         @out, @err = IO.pipe, IO.pipe
         @parent_read, @child_write = IO.pipe
         @child_write.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+
+        @liveness_checker = LivenessChecker.new if check_liveness
 
         @pid = fork do
 
@@ -49,12 +55,17 @@ module Micron
 
           clean_parent_file_descriptors()
 
+          @liveness_checker.pong if check_liveness
+
           # run
+          debug("calling block")
           ret = @block.call()
+          debug("block returned")
 
           # Pass result to parent via pipe
           Marshal.dump(ret, @child_write)
           @child_write.flush
+          debug("wrote result to pipe")
 
           # cleanup
           @out.last.close
@@ -66,6 +77,8 @@ module Micron
         @out.last.close
         @err.last.close
         @child_write.close
+
+        @liveness_checker.ping(self) if check_liveness
 
         self
       end
@@ -138,6 +151,7 @@ module Micron
 
       private
 
+
       # When a new process is started with chef, it shares the file
       # descriptors of the parent. We clean the file descriptors
       # coming from the parent to prevent unintended locking if parent
@@ -149,11 +163,14 @@ module Micron
       # the ulimit based on platform.
       def clean_parent_file_descriptors
         # Don't clean $stdin, $stdout, $stderr, process_status_pipe.
+        keep = [ @child_write.to_i, @out.last.to_i, @err.last.to_i ]
+        keep += @liveness_checker.fds if @liveness_checker
+
         3.upto(256) do |n|
           # We are checking the fd for error pipe before attempting to
           # create a file because error pipe will auto close when we
           # try to create a file since it's set to CLOEXEC.
-          if n != @child_write.to_i && n != @out.last.to_i && n != @err.last.to_i
+          if !keep.include? n then
             begin
               fd = File.for_fd(n)
               fd.close if fd

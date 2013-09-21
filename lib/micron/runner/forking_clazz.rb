@@ -15,7 +15,7 @@ module Micron
           EasyCov.start
           method.run
           method
-        }.run
+        }.run(true)
       end
 
       # Collect the result data
