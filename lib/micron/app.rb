@@ -11,6 +11,8 @@ module Micron
       $0 = "micron: runner"
       Thread.current[:name] = "main thread"
 
+      STDOUT.sync = true
+      STDERR.sync = true
       Micron.trap_thread_dump()
 
       options = Options.parse
