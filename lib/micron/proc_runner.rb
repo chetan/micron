@@ -8,7 +8,7 @@ module Micron
       super(files)
     end
 
-    def run_all_tests
+    def run
       $0 = "micron: proc_runner"
       # ERR.puts "#{$0} (#{$$})"
 

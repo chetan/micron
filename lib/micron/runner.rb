@@ -31,22 +31,6 @@ module Micron
       @results = []
     end
 
-    def run
-      run_all_tests()
-    end
-
-
-    def display_results
-
-      puts "Finished all tests"
-      puts
-
-      results.each do |clazz|
-        display_result(result)
-      end
-
-    end
-
     def display_result(clazz)
       puts "#{clazz.name} ->"
       clazz.methods.each do |m|
@@ -61,7 +45,7 @@ module Micron
       end
     end
 
-    def run_all_tests
+    def run
       @files.each do |file|
 
         # fork for each file
