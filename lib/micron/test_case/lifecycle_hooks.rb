@@ -9,7 +9,8 @@ module Micron
       #
       # See #before_setup for an example.
 
-      def after_setup; end
+      def after_setup
+      end
 
       ##
       # Runs before every test, before setup. This hook is meant for
@@ -44,7 +45,8 @@ module Micron
       #     include MyMinitestPlugin
       #   end
 
-      def before_setup; end
+      def before_setup
+      end
 
       ##
       # Runs after every test, before teardown. This hook is meant for
@@ -53,7 +55,9 @@ module Micron
       #
       # See #before_setup for an example.
 
-      def before_teardown; end
+      def before_teardown
+        EasyCov.checkpoint
+      end
 
       ##
       # Runs after every test, after teardown. This hook is meant for
@@ -62,7 +66,9 @@ module Micron
       #
       # See #before_setup for an example.
 
-      def after_teardown; end
+      def after_teardown
+      end
+
     end # LifecycleHooks
 
   end # TestCase
