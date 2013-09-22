@@ -17,6 +17,7 @@ module Micron
 
       options = Options.parse
 
+      ENV["PARALLEL_EASYCOV"] = "1"
       if !options[:coverage] then
         ENV["DISABLE_EASYCOV"] = "1"
       end
@@ -78,10 +79,13 @@ module Micron
       # Locate easycov path used in tests
       %w{coverage .coverage}.each do |t|
         t = File.join(path, t)
-        if File.directory?(t) && File.exists?(File.join(t, ".resultset.json")) then
+        if File.directory?(t) && !Dir.glob(File.join(t, ".tmp.*.resultset.json")).empty? then
           EasyCov.path = t
         end
       end
+
+      # Merge coverage
+      EasyCov.merge!
 
       # Write coverage
       SimpleCov::ResultMerger.merged_result.format!
