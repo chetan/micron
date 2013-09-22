@@ -71,6 +71,7 @@ module Micron
 
           test_file = TestFile.new(file)
           begin
+            test_file.collect_coverage()
             test_file.load()
             results = test_file.run(ForkingClazz)
           rescue Exception => ex

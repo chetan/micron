@@ -20,6 +20,16 @@ module Micron
         return nil
       end
 
+      # Simply load the file and collect coverage
+      def collect_coverage
+        worker = ForkWorker.new do
+          load(true)
+          EasyCov.dump
+        end
+        worker.run
+        worker.wait
+      end
+
       # Execute the tests in the file, using the given Clazz
       #
       # @param [Clazz] run_clazz
