@@ -41,16 +41,20 @@ module Micron
           puts
           puts indent(underline("Exception:"))
           puts indent(Micron.dump_ex(m.ex, true))
+          puts
 
           if not m.stdout.empty? then
             puts indent(underline("STDOUT:"))
-            puts indent(m.stdout)
+            puts indent(m.stdout.rstrip)
+            puts
           end
 
           if not m.stderr.empty? then
             puts indent(underline("STDERR:"))
-            puts indent(m.stderr)
+            puts indent(m.stderr.rstrip)
+            puts
           end
+
         end
       end
 
