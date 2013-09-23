@@ -27,7 +27,9 @@ module Micron
         EasyCov.merge!
 
         # Write coverage
-        SimpleCov::ResultMerger.merged_result.format!
+        Micron.capture_io {
+          SimpleCov::ResultMerger.merged_result.format!
+        }
       end
 
     end
