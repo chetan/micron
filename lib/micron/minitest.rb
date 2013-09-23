@@ -1,6 +1,8 @@
 
 # Compatibility layer for MiniTest
 
+require "micron"
+
 module MiniTest
   Assertion = Micron::Assertion
 
