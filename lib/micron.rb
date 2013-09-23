@@ -17,7 +17,7 @@ module Micron
 
   class << self
 
-    attr_accessor :backtrace_filter
+    attr_accessor :backtrace_filter, :runner
 
     def filter_backtrace(bt)
       backtrace_filter.call(bt)

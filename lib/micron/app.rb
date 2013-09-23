@@ -61,34 +61,22 @@ module Micron
         }
       end
 
+      # Setup reporters
+      reporters = []
+      if options[:coverage] then
+        reporters << Reporter::Coverage.new
+      end
+      reporters << Reporter::Console.new
+
       # Run tests
       if options[:proc] then
         require "micron/proc_runner"
-        Micron::ProcRunner.new(files).run
+        Micron.runner = Micron::ProcRunner.new(files, reporters)
       else
-        Micron::Runner.new(files).run
+        Micron.runner = Micron::Runner.new(files, reporters)
       end
+      Micron.runner.run
 
-      # coverage report
-      if options[:coverage] then
-        generate_coverage_report(path)
-      end
-    end
-
-    def generate_coverage_report(path)
-      # Locate easycov path used in tests
-      %w{coverage .coverage}.each do |t|
-        t = File.join(path, t)
-        if File.directory?(t) && !Dir.glob(File.join(t, ".tmp.*.resultset.json")).empty? then
-          EasyCov.path = t
-        end
-      end
-
-      # Merge coverage
-      EasyCov.merge!
-
-      # Write coverage
-      SimpleCov::ResultMerger.merged_result.format!
     end
 
   end
