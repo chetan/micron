@@ -88,6 +88,7 @@ module Micron
       }
     end
 
+    # Output synchronization helper. Will NOT work across forks!
     def synchronize(&block)
       @mutex.synchronize(&block)
     end
