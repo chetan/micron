@@ -18,7 +18,7 @@ module Micron
 
       def end_method(m)
         name = m.name.to_s
-        duration = sprintf("%0.4f", m.total_duration)
+        duration = sprintf("%0.3f", m.total_duration)
         puts ralign(indent(name), "#{duration} #{m.status.upcase}")
         if m.failed? and !m.skipped? then
           puts "  <#{m.ex.name}> #{m.ex.message}"
@@ -39,11 +39,13 @@ module Micron
 
         total = pass = fail = skip = 0
         total_duration = 0.0
+        total_assertions = 0
 
         results.each { |c|
           c.methods.each { |m|
             total += 1
             total_duration += m.total_duration
+            total_assertions += m.assertions
             if m.skipped? then
               skip += 1
             elsif m.passed? then
@@ -54,12 +56,12 @@ module Micron
           }
         }
 
-        total_duration = sprintf("%0.4f", total_duration)
+        total_duration = sprintf("%0.3f", total_duration)
 
         puts
         puts "="*CONSOLE_WIDTH
         puts "  PASS: #{pass},  FAIL: #{fail},  SKIP: #{skip}"
-        puts "  TOTAL: #{total} with - assertions in #{total_duration}"
+        puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds"
         puts "="*CONSOLE_WIDTH
       end
 

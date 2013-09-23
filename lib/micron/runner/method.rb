@@ -6,12 +6,13 @@ module Micron
     class Method
 
       attr_reader :clazz, :name, :durations
-      attr_accessor :passed, :ex
+      attr_accessor :passed, :ex, :assertions
       attr_reader :stdout, :stderr
 
       def initialize(clazz, name)
         @passed    = false
         @durations = {}
+        @assertions = 0
 
         @clazz     = clazz
         @name      = name
@@ -49,6 +50,7 @@ module Micron
           self.ex     = ExceptionInfo.new(e)
 
         ensure
+          self.assertions += t._assertions if not t.nil?
           time(:teardown) {
             teardown(t) if not t.nil?
           }
