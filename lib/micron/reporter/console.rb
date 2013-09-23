@@ -21,14 +21,21 @@ module Micron
         duration = sprintf("%0.3f", m.total_duration)
         puts ralign(indent(name), "#{duration} #{m.status.upcase}")
         if m.failed? and !m.skipped? then
-          puts "  <#{m.ex.name}> #{m.ex.message}"
-          puts "    " + Micron.filter_backtrace(m.ex.backtrace).join("\n    ")
+
           puts
-          puts m.stdout
-          puts m.stderr
+          puts indent(underline("Exception:"))
+          puts indent(Micron.dump_ex(m.ex, true))
+
+          if not m.stdout.empty? then
+            puts indent(underline("STDOUT:"))
+            puts indent(m.stdout)
+          end
+
+          if not m.stderr.empty? then
+            puts indent(underline("STDERR:"))
+            puts indent(m.stderr)
+          end
         end
-      rescue Exception => ex
-        puts ex
       end
 
       def end_class(clazz)
@@ -79,7 +86,12 @@ module Micron
 
       # Indent the string by the given amount
       def indent(str, amount=2)
-        (" "*amount) + str
+        i = (" "*amount)
+        (i + str.gsub(/\n/, "\n#{i}")).rstrip
+      end
+
+      def underline(str)
+        str += "\n" + "-"*str.length
       end
 
     end

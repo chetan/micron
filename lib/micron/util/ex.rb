@@ -12,7 +12,7 @@ module Micron
       def dump_ex(ex, include_backtrace=false)
         s = "<#{ex.class}> #{ex.message}"
         if include_backtrace then
-          s += "\n" + filter_backtrace(ex.backtrace).join("\n")
+          s += "\n  " + filter_backtrace(ex.backtrace).join("\n  ")
         end
         return s
       end
