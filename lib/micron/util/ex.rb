@@ -10,7 +10,8 @@ module Micron
       #
       # @return [String]
       def dump_ex(ex, include_backtrace=false)
-        s = "<#{ex.class}> #{ex.message}"
+        name = ex.respond_to?(:name) ? ex.name : ex.class.to_s
+        s = "<#{name}> #{ex.message}"
         if include_backtrace then
           s += "\n  " + filter_backtrace(ex.backtrace).join("\n  ")
         end
