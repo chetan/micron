@@ -85,6 +85,18 @@ module Micron
         puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
         puts "  PASS: #{pass},  FAIL: #{fail},  SKIP: #{skip}"
         puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds"
+
+        if fail > 0 then
+          puts
+          puts "  Failed tests:"
+          results.each { |c|
+            c.methods.each { |m|
+              if !m.skipped? and m.failed? then
+                puts "    #{c.name}##{m.name}"
+              end
+            }
+          }
+        end
         puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
       end
 
