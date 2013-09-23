@@ -1,4 +1,6 @@
 
+require "colorize"
+
 module Micron
   class Reporter
     class Console < Reporter
@@ -19,7 +21,21 @@ module Micron
       def end_method(m)
         name = m.name.to_s
         duration = sprintf("%0.3f", m.total_duration)
-        puts ralign(indent(name), "#{duration} #{m.status.upcase}")
+
+        status = m.status.upcase
+
+        str = ralign(indent(name), "#{duration} #{status}")
+
+        # inject color after so we don't screw up the alignment
+        if m.skipped? then
+          str.gsub!(/#{status}$/, status.colorize(:light_yellow))
+        elsif m.passed? then
+          str.gsub!(/#{status}$/, status.colorize(:light_green))
+        else
+          str.gsub!(/#{status}$/, status.colorize(:light_red))
+        end
+        puts str
+
         if m.failed? and !m.skipped? then
 
           puts
@@ -66,10 +82,10 @@ module Micron
         total_duration = sprintf("%0.3f", total_duration)
 
         puts
-        puts "="*CONSOLE_WIDTH
+        puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
         puts "  PASS: #{pass},  FAIL: #{fail},  SKIP: #{skip}"
         puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds"
-        puts "="*CONSOLE_WIDTH
+        puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
       end
 
 

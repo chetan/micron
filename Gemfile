@@ -3,6 +3,7 @@ source "https://rubygems.org"
 gem "easycov", :github => "chetan/easycov"
 
 gem "hitimes"
+gem "colorize"
 
 group :development do
   gem "yard", "~> 0.8"

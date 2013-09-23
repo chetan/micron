@@ -27,6 +27,7 @@ GEM
   specs:
     addressable (2.3.5)
     builder (3.2.2)
+    colorize (0.5.8)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     git (1.2.6)
@@ -72,6 +73,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.1)
+  colorize
   easycov!
   hitimes
   jeweler!
