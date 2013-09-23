@@ -7,8 +7,9 @@ module Micron
 
       attr_reader :name, :methods
 
-      def initialize(clazz)
+      def initialize(clazz, file)
         @name = clazz.to_s
+        @file = file
         @methods = test_methods.map { |m| Method.new(self, m) }
       end
 

@@ -11,7 +11,7 @@ module Micron
     def start_class(clazz)
     end
 
-    def add_method(method)
+    def end_method(method)
     end
 
     def end_class(clazz)
@@ -20,7 +20,7 @@ module Micron
     def end_file(test_file)
     end
 
-    def end_tests(files)
+    def end_tests(files, results)
     end
 
   end

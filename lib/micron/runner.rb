@@ -11,6 +11,8 @@ require "micron/runner/parallel_clazz"
 require "micron/runner/fork_worker"
 require "micron/runner/forking_clazz"
 
+require "micron/reporter"
+
 module Micron
 
   # Default Runner - forks for each file
@@ -26,34 +28,25 @@ module Micron
 
     attr_reader :results
 
-    def initialize(files)
-      @files = files
-      @results = []
-    end
-
-    def display_result(clazz)
-      puts "#{clazz.name} ->"
-      clazz.methods.each do |m|
-        puts "  #{m.name}: (#{m.status}) #{m.total_duration}"
-        if m.failed? and !m.skipped? then
-          puts "  <#{m.ex.name}> #{m.ex.message}"
-          puts "    " + Micron.filter_backtrace(m.ex.backtrace).join("\n    ")
-          puts
-          puts m.stdout
-          puts m.stderr
-        end
-      end
+    def initialize(files, reporters)
+      @files     = files
+      @results   = []
+      @reporters = reporters || []
     end
 
     def run
+      report(:start_tests, @files)
+
       @files.each do |file|
 
         # fork for each file
-        worker = ForkWorker.new {
+        worker = ForkWorker.new(nil, false) {
           $0 = "micron: class"
           # ERR.puts "micron: class (#{$$})"
 
           test_file = TestFile.new(file)
+          report(:start_file, test_file)
+
           begin
             test_file.collect_coverage()
             test_file.load()
@@ -75,18 +68,21 @@ module Micron
           end
 
           # should be a Clazz
-          add_result(clazz)
+          @results << clazz
         end
 
       end
+
+      report(:end_tests, @files, @results)
     end
 
-    # Add a new result Clazz
-    def add_result(clazz)
-      @results << clazz
-      display_result(clazz)
+    # Fire the given report event on all reporters
+    #
+    # @param [Symbol] method
+    # @param [*args]
+    def report(method, *args)
+      @reporters.each { |r| r.send(method, *args) }
     end
 
-  end
-
-end
+  end # Runner
+end # Micron

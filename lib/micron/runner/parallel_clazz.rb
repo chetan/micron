@@ -18,10 +18,10 @@ module Micron
         end
 
         # wait for all test methods to return
-        finished = wait_for_tests(tests)
+        @methods = wait_for_tests(tests)
 
         # collect results
-        @methods = collect_results(finished)
+        # @methods = collect_results(finished)
         debug "collected #{@methods.size} methods"
       end
 
@@ -29,11 +29,15 @@ module Micron
       private
 
       # Wait for all test processes to complete, rerunning failures if needed
+      #
+      # @param [ForkWorker] tests
+      #
+      # @return [Array<Method>]
       def wait_for_tests(tests)
 
         # OUT.puts "waiting for tests"
 
-        finished = []
+        results = []
         watchers = []
         hang_watchers = []
 
@@ -59,7 +63,9 @@ module Micron
                   # puts "process #{test.pid} exited with status #{status}"
 
                   if status == 0 then
-                    finished << test
+                    method = collect_result(test)
+                    Micron.runner.report(:end_method, method)
+                    results << method
 
                   elsif status == 6 || status == 4 || status == 9 then
                     # segfault/coredump due to coverage
@@ -112,7 +118,7 @@ module Micron
         meta_watcher.kill
         hang_watchers.each{ |t| t.kill }
 
-        return finished
+        return results
       end
 
     end

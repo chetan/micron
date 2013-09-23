@@ -42,13 +42,15 @@ module Micron
         TestCase.subclasses.each do |test_clazz|
           # should really only be one per file..
           begin
-            clazz = run_clazz.new(test_clazz)
+            clazz = run_clazz.new(test_clazz, @filename)
             if clazz.methods.empty? then
               next
             end
 
+            Micron.runner.report(:start_class, clazz)
             clazz.run
             results << clazz
+            Micron.runner.report(:end_class, clazz)
 
           rescue Exception => ex
             # Error with loading the test class itself

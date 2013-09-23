@@ -25,33 +25,24 @@ module Micron
         }.run
       end
 
-      # Collect the result data
-
       # Because we fork exec, we can't just read the back from a pipe. Instead,
       # the child process dumps it to a file and we load it from there.
       #
-      # @param [Array] finished       Completed pids & their associated methods
+      # @param [ForkWorker] test
       #
-      # @return [Array<Method>]
-      def collect_results(finished)
-        results = [] # result methods
-        finished.each do |test|
+      # @return [Method]
+      def collect_result(test)
+        results = []
+        data_file = File.join(ENV["MICRON_PATH"], "#{test.pid}.data")
 
-          data_file = File.join(ENV["MICRON_PATH"], "#{test.pid}.data")
-
-          # File is missing if the process crashed (coverage bug)
-          # we can always try again, perhaps??
-          next if not File.exists? data_file
-
-          File.open(data_file) do |f|
-            while !f.eof
-              results << Marshal.load(f) # read Method from child via file
-            end
+        File.open(data_file) do |f|
+          while !f.eof
+            results << Marshal.load(f) # read Method from child via file
           end
-          File.delete(data_file)
         end
+        File.delete(data_file)
 
-        return results
+        return results.first # should always be just one
       end
 
     end

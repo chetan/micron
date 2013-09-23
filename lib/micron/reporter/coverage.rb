@@ -5,7 +5,7 @@ module Micron
     # Reporter which generates coverage report using SimpleCov
     class Coverage < Reporter
 
-      def end_tests(files)
+      def end_tests(files, results)
         generate_coverage_report()
       end
 

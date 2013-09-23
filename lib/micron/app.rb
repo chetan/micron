@@ -33,15 +33,26 @@ module Micron
         $: << t if File.directory?(t)
       end
 
+      # Setup reporters
+      reporters = []
+      reporters << Reporter::Console.new
+
       # Spawn child runner if called
       if options[:runclass] then
         require "micron/proc_runner"
-        ProcRunner.new.run_class
+        Micron.runner = Micron::ProcRunner.new(nil, reporters)
+        Micron.runner.run_class
         exit
       elsif options[:runmethod] then
         require "micron/proc_runner"
-        ProcRunner.new.run_method
+        Micron.runner = Micron::ProcRunner.new(nil, reporters)
+        Micron.runner.run_method
         exit
+      end
+
+      # Add coverage reporter
+      if options[:coverage] then
+        reporters.unshift Reporter::Coverage.new
       end
 
       # Find tests to run
@@ -60,13 +71,6 @@ module Micron
           f =~ /^(test_.*|.*_test)\.rb$/
         }
       end
-
-      # Setup reporters
-      reporters = []
-      if options[:coverage] then
-        reporters << Reporter::Coverage.new
-      end
-      reporters << Reporter::Console.new
 
       # Run tests
       if options[:proc] then

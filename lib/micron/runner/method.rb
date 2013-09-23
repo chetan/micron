@@ -69,11 +69,11 @@ module Micron
 
       def status
         if skipped? then
-          "skipped"
+          "skip"
         elsif passed? then
-          "passed"
+          "pass"
         else
-          "failed"
+          "fail"
         end
       end
 

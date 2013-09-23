@@ -23,11 +23,12 @@ module Micron
 
       attr_reader :pid, :context, :status
 
-      def initialize(context=nil, capture_io=true, &block)
-        @context    = context
-        @capture_io = capture_io
-        @block      = block
-        @done       = false
+      def initialize(context=nil, capture_stdout=true, capture_stderr=true, &block)
+        @context        = context
+        @capture_stdout = capture_stdout
+        @capture_stderr = capture_stderr
+        @block          = block
+        @done           = false
       end
 
       def run(check_liveness=false)
@@ -47,11 +48,9 @@ module Micron
           @err.first.close
           @parent_read.close
 
-          if @capture_io
-            # redirect io
-            STDOUT.reopen @out.last
-            STDERR.reopen @err.last
-          end
+          # redirect io
+          STDOUT.reopen(@out.last) if @capture_stdout
+          STDERR.reopen(@err.last) if @capture_stderr
           STDOUT.sync = STDERR.sync = true
 
           clean_parent_file_descriptors()

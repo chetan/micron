@@ -24,7 +24,11 @@ module Micron
       #
       # @return [Array<Method>]
       def collect_results(finished)
-        finished.map{ |f| f.result }
+        finished.map{ |f| collect_result(f) }
+      end
+
+      def collect_result(worker)
+        worker.result
       end
 
     end

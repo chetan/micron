@@ -4,8 +4,8 @@ require "micron/runner/proc_clazz"
 module Micron
   class ProcRunner < Runner
 
-    def initialize(files=nil)
-      super(files)
+    def initialize(files=nil, reporters=nil)
+      super(files, reporters)
     end
 
     def run
@@ -40,7 +40,7 @@ module Micron
             end
 
             # should be a Clazz
-            add_result(clazz)
+            @results << clazz
           end
         end
         File.delete(data_file)
