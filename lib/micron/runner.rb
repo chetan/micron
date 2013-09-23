@@ -32,6 +32,8 @@ module Micron
       @files     = files
       @results   = []
       @reporters = reporters || []
+
+      @mutex = Mutex.new
     end
 
     def run
@@ -81,7 +83,13 @@ module Micron
     # @param [Symbol] method
     # @param [*args]
     def report(method, *args)
-      @reporters.each { |r| r.send(method, *args) }
+      synchronize {
+        @reporters.each { |r| r.send(method, *args) }
+      }
+    end
+
+    def synchronize(&block)
+      @mutex.synchronize(&block)
     end
 
   end # Runner
