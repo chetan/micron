@@ -1,5 +1,8 @@
 
+require "micron/runner/parallel_clazz"
+require "micron/runner/fork_worker"
 require "micron/runner/proc_clazz"
+require "micron/test_case/teardown_coverage"
 
 module Micron
   class ProcRunner < Runner
