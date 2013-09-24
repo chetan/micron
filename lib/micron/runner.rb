@@ -67,6 +67,7 @@ module Micron
 
       end
 
+      EasyCov.dump
       report(:end_tests, @files, @results)
     end
 
