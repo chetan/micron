@@ -43,7 +43,7 @@ module Micron
         begin
           clazz = run_clazz.new(test_clazz, @filename)
           if clazz.methods.empty? then
-            raise NoMethodError, "#{test_clazz.class} has no test methods"
+            raise NoMethodError, "#{test_clazz.to_s} has no test methods"
           end
 
           Micron.runner.report(:start_class, clazz)

@@ -1,7 +1,6 @@
 
 module Micron
-
-  class ForkRunner
+  class ForkRunner < Runner
 
     def run
       report(:start_tests, @files)

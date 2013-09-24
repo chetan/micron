@@ -17,8 +17,12 @@ module Micron
             options[:coverage] = false
           }
 
-          opts.on("--proc", "Use process runner") {
+          opts.on("--proc", "Use the process runner") {
             options[:proc] = true
+          }
+
+          opts.on("--fork", "Use the forking runner") {
+            options[:fork] = true
           }
 
           opts.on("--runclass", "Run class in child process") {

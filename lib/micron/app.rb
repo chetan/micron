@@ -76,6 +76,9 @@ module Micron
       if options[:proc] then
         require "micron/proc_runner"
         Micron.runner = Micron::ProcRunner.new(files, reporters)
+      elsif options[:fork] then
+        require "micron/fork_runner"
+        Micron.runner = Micron::ForkRunner.new(files, reporters)
       else
         Micron.runner = Micron::Runner.new(files, reporters)
       end
