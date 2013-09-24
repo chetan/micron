@@ -7,7 +7,7 @@ require "fileutils"
 module Micron
   class App
 
-    def run
+    def run(options=nil)
       $0 = "micron: runner"
       Thread.current[:name] = "main thread"
 
@@ -15,7 +15,7 @@ module Micron
       STDERR.sync = true
       Micron.trap_thread_dump()
 
-      options = Options.parse
+      options ||= Options.parse
 
       ENV["PARALLEL_EASYCOV"] = "1"
       if !options[:coverage] then
@@ -24,6 +24,7 @@ module Micron
 
       # Setup paths
       # TODO allow setting path/root some other way
+      path = options.delete(:path)
       path = File.expand_path(Dir.pwd)
       ENV["MICRON_PATH"] = File.join(path, ".micron")
       FileUtils.mkdir_p(ENV["MICRON_PATH"])
