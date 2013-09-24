@@ -38,25 +38,23 @@ module Micron
       def run(run_clazz)
 
         results = []
+        test_clazz = TestCase.subclasses.last
 
-        TestCase.subclasses.each do |test_clazz|
-          # should really only be one per file..
-          begin
-            clazz = run_clazz.new(test_clazz, @filename)
-            if clazz.methods.empty? then
-              next
-            end
-
-            Micron.runner.report(:start_class, clazz)
-            clazz.run
-            results << clazz
-            Micron.runner.report(:end_class, clazz)
-
-          rescue Exception => ex
-            # Error with loading the test class itself
-            results << ex
-            return results
+        begin
+          clazz = run_clazz.new(test_clazz, @filename)
+          if clazz.methods.empty? then
+            raise NoMethodError, "#{test_clazz.class} has no test methods"
           end
+
+          Micron.runner.report(:start_class, clazz)
+          clazz.run
+          results << clazz
+          Micron.runner.report(:end_class, clazz)
+
+        rescue Exception => ex
+          # Error with loading the test class itself
+          results << ex
+          return results
         end
 
         return results
