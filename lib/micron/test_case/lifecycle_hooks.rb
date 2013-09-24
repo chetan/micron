@@ -56,7 +56,6 @@ module Micron
       # See #before_setup for an example.
 
       def before_teardown
-        EasyCov.checkpoint
       end
 
       ##
