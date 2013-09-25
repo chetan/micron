@@ -75,14 +75,21 @@ module Micron
                     debug "respawned failed test: #{method.clazz.name}##{method.name}"
 
                   else
-                    puts
-                    puts "== UNKNOWN ERROR! =="
-                    puts "STATUS: #{status}"
-                    puts "STDERR:"
-                    puts f.stderr
-                    puts "STDOUT:"
-                    puts f.stdout
-                    exit 3
+                    debug
+                    debug "== UNKNOWN ERROR! =="
+                    debug "STATUS: #{status}"
+                    if !test.stdout.empty? then
+                      debug "STDOUT:"
+                      debug test.stdout
+                    else
+                      debug "NO STDOUT"
+                    end
+                    if !test.stderr.empty? then
+                      debug "STDERR:"
+                      debug test.stderr
+                    else
+                      debug "NO STDERR"
+                    end
 
                   end
 
