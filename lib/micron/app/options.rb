@@ -4,12 +4,33 @@ require 'optparse'
 module Micron
   class App
     class Options
-      def self.parse
 
-        options = {
-          :coverage => true
-        }
+      DEFAULTS = {
+        :coverage => true
+      }
 
+      def self.parse(options=nil)
+
+        # always try to use default options first
+        if options then
+          options = DEFAULTS.merge(options)
+        else
+          options = DEFAULTS.dup
+        end
+
+        # then rc file
+        rc = File.join(Dir.pwd, ".micronrc")
+        if File.exists? rc then
+          parse_opts(options, File.read(rc).split(" "))
+        end
+
+        # then anything on command line
+        parse_opts(options, ARGV)
+
+        return options
+      end
+
+      def self.parse_opts(options, argv)
         parser = OptionParser.new do |opts|
           opts.banner = "usage: #{$0} [options]"
 
@@ -35,7 +56,8 @@ module Micron
         end
 
         begin
-          parser.parse!
+          parser.parse!(argv)
+
         rescue Exception => ex
           exit if ex.kind_of? SystemExit
           STDERR.puts "error: #{ex}"
@@ -45,8 +67,7 @@ module Micron
         end
 
         return options
-
-      end # self.parse
+      end # self.parse_opts
     end
   end
 end
