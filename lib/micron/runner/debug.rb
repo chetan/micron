@@ -3,7 +3,7 @@ module Micron
   class Runner
     module Debug
 
-      def debug(str)
+      def debug(str="")
 
         return
 

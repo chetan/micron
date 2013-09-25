@@ -1,4 +1,5 @@
 
+require "micron/runner/debug"
 require "micron/runner/liveness_checker"
 
 module Micron
@@ -68,9 +69,18 @@ module Micron
           debug("wrote result to pipe")
 
           # cleanup
-          @out.last.close
+          begin
+            @out.last.close
+          rescue
+          end
+          begin
           @err.last.close
+          rescue
+          end
+          begin
           @child_write.close
+          rescue
+          end
         end
 
         # close unused writers in parent
