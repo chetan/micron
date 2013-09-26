@@ -85,7 +85,7 @@ module Micron
       # ERR.puts "test_method: #{test_method}"
 
       test_file = TestFile.new(test_filename)
-      test_file.load()
+      test_file.load(true)
       # load and run a specific method only
       result = test_file.run_method(test_clazz, test_method, Clazz)
 

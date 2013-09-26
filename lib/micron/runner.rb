@@ -49,7 +49,7 @@ module Micron
         report(:start_file, test_file)
 
         begin
-          test_file.load()
+          test_file.load(true)
           results = test_file.run(Clazz)
         rescue Exception => ex
           results = [ex]
