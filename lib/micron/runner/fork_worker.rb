@@ -160,24 +160,14 @@ module Micron
       private
 
 
-      # When a new process is started with chef, it shares the file
-      # descriptors of the parent. We clean the file descriptors
-      # coming from the parent to prevent unintended locking if parent
-      # is killed.
-      # NOTE: After some discussions we've decided to iterate on file
-      # descriptors upto 256. We believe this  is a reasonable upper
-      # limit in a chef environment. If we have issues in the future this
-      # number could be made to be configurable or updated based on
-      # the ulimit based on platform.
+      # Cleanup all FDs inherited from the parent. We don't need them and we
+      # may throw errors if they are left open. 8192 should be high enough.
       def clean_parent_file_descriptors
-        # Don't clean $stdin, $stdout, $stderr, process_status_pipe.
+        # Don't clean $stdin, $stdout, $stderr (0-2) or our own pipes
         keep = [ @child_write.to_i, @out.last.to_i, @err.last.to_i ]
         keep += @liveness_checker.fds if @liveness_checker
 
         3.upto(8192) do |n|
-          # We are checking the fd for error pipe before attempting to
-          # create a file because error pipe will auto close when we
-          # try to create a file since it's set to CLOEXEC.
           if !keep.include? n then
             begin
               fd = IO.for_fd(n)
