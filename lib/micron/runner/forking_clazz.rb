@@ -13,7 +13,11 @@ module Micron
           # ERR.puts "#{$0} (#{$$})"
 
           EasyCov.start
-          method.run
+
+          Shim.wrap {
+            method.run
+          }
+
           method
         }.run(true)
       end

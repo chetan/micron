@@ -14,6 +14,7 @@ module Micron
       STDOUT.sync = true
       STDERR.sync = true
       Micron.trap_thread_dump()
+      Micron::Runner::Shim.setup
 
       options ||= Options.parse
 
@@ -84,6 +85,8 @@ module Micron
         Micron.runner = Micron::Runner.new(files, reporters)
       end
       Micron.runner.run
+
+      Micron::Runner::Shim.cleanup!
 
     end
 

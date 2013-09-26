@@ -1,4 +1,6 @@
 
+require "micron/runner/shim"
+
 require "micron/runner/backtrace_filter"
 require "micron/runner/debug"
 
