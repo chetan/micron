@@ -5,6 +5,7 @@ module Micron
   class Runner
     class Shim
 
+      # Create a temp shim path
       def self.setup
 
         ruby_path = `which ruby`.strip
@@ -32,6 +33,8 @@ EOF
 
       end # setup
 
+      # Clean up any existing shim dirs. This should be called only when the
+      # master process exists (i.e. Micron::App)
       def self.cleanup!
         # return
         Dir.glob(File.join(Dir.tmpdir, "micron-shim-*")).each do |d|
@@ -39,6 +42,8 @@ EOF
         end
       end
 
+      # Wrap the given call with our shim PATH. Any calls to ruby will be
+      # redirected to our script to enable coverage collection.
       def self.wrap(&block)
         # enable shim
         ENV["EASYCOV_PATH"] = EasyCov.path
