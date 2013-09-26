@@ -69,18 +69,9 @@ module Micron
           debug("wrote result to pipe")
 
           # cleanup
-          begin
-            @out.last.close
-          rescue
-          end
-          begin
+          @out.last.close
           @err.last.close
-          rescue
-          end
-          begin
           @child_write.close
-          rescue
-          end
         end
 
         # close unused writers in parent
@@ -183,13 +174,13 @@ module Micron
         keep = [ @child_write.to_i, @out.last.to_i, @err.last.to_i ]
         keep += @liveness_checker.fds if @liveness_checker
 
-        3.upto(256) do |n|
+        3.upto(8192) do |n|
           # We are checking the fd for error pipe before attempting to
           # create a file because error pipe will auto close when we
           # try to create a file since it's set to CLOEXEC.
           if !keep.include? n then
             begin
-              fd = File.for_fd(n)
+              fd = IO.for_fd(n)
               fd.close if fd
             rescue
             end
