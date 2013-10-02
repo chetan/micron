@@ -57,7 +57,7 @@ module Micron
         result = nil
 
         need_to_diff =
-          Micron::Assertions.diff &&
+          Micron::TestCase::Assertions.diff &&
           (expect.include?("\n")    ||
            butwas.include?("\n")    ||
            expect.size > 30         ||
@@ -75,7 +75,7 @@ module Micron
             b.puts butwas
             b.flush
 
-            result = `#{Micron::Assertions.diff} #{a.path} #{b.path}`
+            result = `#{Micron::TestCase::Assertions.diff} #{a.path} #{b.path}`
             result.sub!(/^\-\-\- .+/, "--- expected")
             result.sub!(/^\+\+\+ .+/, "+++ actual")
 
@@ -155,7 +155,7 @@ module Micron
       #
       # For floats use assert_in_delta.
       #
-      # See also: Micron::Assertions.diff
+      # See also: Micron::TestCase::Assertions.diff
 
       def assert_equal exp, act, msg = nil
         msg = message(msg, "") { diff exp, act }
