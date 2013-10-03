@@ -74,6 +74,8 @@ module Micron
         }
       end
 
+      files.sort!
+
       # Run tests
       if options[:proc] then
         require "micron/proc_runner"
