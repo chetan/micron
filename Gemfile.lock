@@ -1,9 +1,8 @@
 GIT
   remote: git://github.com/chetan/easycov.git
-  revision: e15dd5a8b04a87da5d3437719032014b3a4538a0
+  revision: 58be40eddda14fb8db4f1b72427922e8054bae7a
   specs:
-    easycov (0.1.0)
-      lockfile
+    easycov (0.1.1)
       multi_json
       simplecov
 
@@ -27,7 +26,7 @@ GEM
   specs:
     addressable (2.3.5)
     builder (3.2.2)
-    colorize (0.5.8)
+    colorize (0.6.0)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     git (1.2.6)
@@ -45,7 +44,6 @@ GEM
     json (1.8.0)
     jwt (0.1.8)
       multi_json (>= 1.5)
-    lockfile (2.1.0)
     minitest (4.7.5)
     multi_json (1.8.0)
     multi_xml (0.5.5)
@@ -66,7 +64,7 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.7.1)
     simplecov-html (0.7.1)
-    yard (0.8.7.1)
+    yard (0.8.7.2)
 
 PLATFORMS
   ruby
