@@ -3,6 +3,9 @@
 
 require "micron"
 
+old_verbose = $VERBOSE
+$VERBOSE = nil
+
 module MiniTest
   Assertion = Micron::Assertion
 
@@ -38,3 +41,5 @@ module MiniTest
 
   end
 end
+
+$VERBOSE = old_verbose
