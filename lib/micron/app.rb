@@ -61,17 +61,17 @@ module Micron
       files = []
       if not ARGV.empty? then
         ARGV.each do |f|
-          if File.exists? f then
+          if File.file? f then
             files << File.expand_path(f)
+          elsif File.directory? f then
+            files += find_tests(File.expand_path(f))
           end
         end
       end
+      files.flatten!
 
       if files.empty? then
-        files = Dir.glob(File.join(path, "**/*.rb")).find_all { |f|
-          f = File.basename(f)
-          f =~ /^(test_.*|.*_test)\.rb$/
-        }
+        files = find_tests(path)
       end
 
       files.sort!
@@ -90,6 +90,16 @@ module Micron
 
       Micron::Runner::Shim.cleanup!
 
+    end
+
+
+    private
+
+    def find_tests(path)
+      Dir.glob(File.join(path, "**/*.rb")).find_all { |f|
+        f = File.basename(f)
+        f =~ /^(test_.*|.*_test)\.rb$/
+      }
     end
 
   end
