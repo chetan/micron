@@ -11,6 +11,10 @@ module MiniTest
     VERSION = "4.7"
     TestCase = Micron::TestCase
 
+    def self.autorun
+      # noop
+    end
+
     class TestCase
 
       def name
