@@ -1,6 +1,4 @@
 
-require "lockfile"
-
 module Micron
   class Runner
 
