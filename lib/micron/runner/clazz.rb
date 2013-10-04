@@ -15,7 +15,7 @@ module Micron
 
       # Create a new instance of the Class represented by this object
       def create
-        Object.const_get(name).new
+        name_to_const.new
       end
 
       def run
@@ -34,6 +34,12 @@ module Micron
         }
       end
 
+      def name_to_const
+        Module.const_get(name)
+      end
+
     end
   end
 end
+
+require "micron/runner/clazz19" if RUBY_VERSION =~ /1.9/
