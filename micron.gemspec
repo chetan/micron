@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chetan Sarva"]
-  s.date = "2013-09-26"
+  s.date = "2013-10-04"
   s.description = "An extremely minimal unit test library for Ruby"
   s.email = "chetan@pixelcop.net"
   s.executables = ["micron"]
@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
     "lib/micron/runner.rb",
     "lib/micron/runner/backtrace_filter.rb",
     "lib/micron/runner/clazz.rb",
+    "lib/micron/runner/clazz19.rb",
     "lib/micron/runner/debug.rb",
     "lib/micron/runner/exception_info.rb",
     "lib/micron/runner/fork_worker.rb",
@@ -59,7 +60,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/chetan/micron"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "2.1.0"
+  s.rubygems_version = "2.1.5"
   s.summary = "Minimal unit tests for Ruby"
 
   if s.respond_to? :specification_version then
