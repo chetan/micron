@@ -34,6 +34,7 @@ module Micron
       @mutex = Mutex.new
 
       if self.class.to_s != "Micron::Runner" then
+        # Only needed in fork/proc runners
         TestCase.class_eval do
           include TestCase::TeardownCoverage
         end
