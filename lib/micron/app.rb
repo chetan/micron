@@ -86,10 +86,11 @@ module Micron
       else
         Micron.runner = Micron::Runner.new(files, reporters)
       end
-      Micron.runner.run
+      results = Micron.runner.run
 
       Micron::Runner::Shim.cleanup!
 
+      exit(count_failures(results) > 0 ? 1 : 0)
     end
 
 
@@ -100,6 +101,21 @@ module Micron
         f = File.basename(f)
         f =~ /^(test_.*|.*_test)\.rb$/
       }
+    end
+
+    # Count the number of failures in the list of results
+    #
+    # @param [Array<Clazz>] results
+    #
+    # @return [Fixnum]
+    def count_failures(results)
+      fail = 0
+      results.each { |c|
+        c.methods.each { |m|
+          fail += 1 if !m.skipped? && !m.passed?
+        }
+      }
+      return fail
     end
 
   end

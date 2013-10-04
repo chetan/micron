@@ -71,6 +71,8 @@ module Micron
 
       EasyCov.dump
       report(:end_tests, @files, @results)
+
+      return @results
     end
 
     # Fire the given report event on all reporters

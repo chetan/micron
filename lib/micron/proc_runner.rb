@@ -50,6 +50,7 @@ module Micron
 
       end
 
+      return @results
     end # run_all_tests
 
 

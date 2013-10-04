@@ -47,6 +47,8 @@ module Micron
       end
 
       report(:end_tests, @files, @results)
+
+      return @results
     end
 
   end # ForkRunner
