@@ -40,8 +40,15 @@ module Micron
 
           puts
           puts indent(underline("Exception:"))
-          puts indent(Micron.dump_ex(m.ex, true))
-          puts
+          if m.ex.kind_of? Array then
+            m.ex.each{ |ex|
+              puts indent(Micron.dump_ex(ex, true))
+              puts
+            }
+          else
+            puts indent(Micron.dump_ex(m.ex, true))
+            puts
+          end
 
           if not m.stdout.empty? then
             puts indent(underline("STDOUT:"))
