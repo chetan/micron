@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chetan Sarva"]
-  s.date = "2013-10-04"
+  s.date = "2013-10-07"
   s.description = "An extremely minimal unit test library for Ruby"
   s.email = "chetan@pixelcop.net"
   s.executables = ["micron"]
@@ -51,6 +51,7 @@ Gem::Specification.new do |s|
     "lib/micron/test_case.rb",
     "lib/micron/test_case/assertions.rb",
     "lib/micron/test_case/lifecycle_hooks.rb",
+    "lib/micron/test_case/redir_logging.rb",
     "lib/micron/test_case/teardown_coverage.rb",
     "lib/micron/util/ex.rb",
     "lib/micron/util/io.rb",
