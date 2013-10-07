@@ -68,7 +68,7 @@ module Micron
       #
       # @return [Method]
       def run_method(test_clazz, test_method, run_clazz)
-        clazz = run_clazz.new(Module.const_get(test_clazz))
+        clazz = run_clazz.new(test_clazz, @filename)
         method = clazz.methods.find{ |m| m.name.to_s == test_method }
         method.run
 
