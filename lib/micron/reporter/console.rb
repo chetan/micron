@@ -8,6 +8,7 @@ module Micron
       CONSOLE_WIDTH = 100
 
       def start_tests(files)
+        @runtime = Hitimes::Interval.now
         puts "="*CONSOLE_WIDTH
         puts ralign("START TESTS (#{files.size} files)", "#{Time.new}")
         puts "="*CONSOLE_WIDTH
@@ -71,6 +72,8 @@ module Micron
 
       def end_tests(files, results)
 
+        @runtime.stop
+
         total = pass = fail = skip = 0
         total_duration = 0.0
         total_assertions = 0
@@ -91,11 +94,12 @@ module Micron
         }
 
         total_duration = sprintf("%0.3f", total_duration)
+        real_runtime = sprintf("%0.3f", @runtime.duration)
 
         puts
         puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
         puts "  PASS: #{pass},  FAIL: #{fail},  SKIP: #{skip}"
-        puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds"
+        puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds (wall time: #{real_runtime})"
 
         if fail > 0 then
           puts
