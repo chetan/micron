@@ -16,7 +16,7 @@ module Micron
       Micron.trap_thread_dump()
       Micron::Runner::Shim.setup
 
-      options ||= Options.parse
+      options = Options.parse(options)
 
       ENV["PARALLEL_EASYCOV"] = "1"
       if !options[:coverage] then
