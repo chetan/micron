@@ -18,6 +18,7 @@ module Micron
       state_path = ENV["MICRON_PATH"]
       FileUtils.mkdir_p(state_path)
 
+      report(:start_tests, @files)
       @files.each do |file|
 
         ENV["MICRON_TEST_FILE"] = file
@@ -50,8 +51,10 @@ module Micron
 
       end
 
+      report(:end_tests, @files, @results)
+
       return @results
-    end # run_all_tests
+    end # run
 
 
     # Child process which runs an entire test file/class
@@ -60,6 +63,8 @@ module Micron
       # ERR.puts "micron: proc_run_class (#{$$})"
 
       test_file = TestFile.new(test_filename)
+      report(:start_file, test_file)
+
       begin
         test_file.load(false)
         results = test_file.run(ProcClazz)
@@ -77,7 +82,7 @@ module Micron
     # Child process which runs a single method in a given file & class
     def run_method
       $0 = "micron:proc_run_method"
-      ERR.puts "#{$0} (#{$$})"
+      # ERR.puts "#{$0} (#{$$})"
 
       test_clazz = ENV["MICRON_TEST_CLASS"]
       test_method = ENV["MICRON_TEST_METHOD"]
