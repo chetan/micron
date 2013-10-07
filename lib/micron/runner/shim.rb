@@ -11,6 +11,12 @@ module Micron
         ruby_path = `which ruby`.strip
         shim = <<-EOF
 #!#{ruby_path}
+
+if ENV["BUNDLE_GEMFILE"] then
+  require "bundler"
+  Bundler.setup(:default, :development)
+end
+
 require "easycov"
 
 EasyCov.path = ENV["EASYCOV_PATH"]
