@@ -110,8 +110,10 @@ module Micron
             raise
           rescue Exception => e
             self.passed = false
-            if !self.ex.nil? then
-              self.ex = [ self.ex, ExceptionInfo.new(e) ]
+            if self.ex.nil? then
+              self.ex = e
+            else
+              self.ex = [ self.ex, ExceptionInfo.new(e) ].flatten!
             end
           end
         end
