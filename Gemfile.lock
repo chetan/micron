@@ -21,6 +21,14 @@ GIT
       rake
       rdoc
 
+PATH
+  remote: .
+  specs:
+    micron (0.1.0)
+      colorize
+      easycov
+      hitimes
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -75,5 +83,6 @@ DEPENDENCIES
   easycov!
   hitimes
   jeweler!
+  micron!
   minitest (~> 4.0)
   yard (~> 0.8)

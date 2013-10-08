@@ -1,5 +1,9 @@
 source "https://rubygems.org"
 
+group :local do
+  gem "micron", :path => "."
+end
+
 gem "easycov", :github => "chetan/easycov"
 
 gem "hitimes"
