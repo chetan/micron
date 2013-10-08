@@ -43,9 +43,13 @@ module Micron
           puts indent(underline("Exception:"))
           if m.ex.kind_of? Array then
             m.ex.each{ |ex|
+              next if m.ex.nil?
               puts indent(Micron.dump_ex(ex, true))
               puts
             }
+          elsif m.ex.nil? then
+            puts indent("nil")
+            puts
           else
             puts indent(Micron.dump_ex(m.ex, true))
             puts
