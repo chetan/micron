@@ -30,9 +30,13 @@ module Micron
       ENV["MICRON_PATH"] = File.join(path, ".micron")
       FileUtils.mkdir_p(ENV["MICRON_PATH"])
 
+      test_paths = []
       %w{test .test}.each do |t|
         t = File.join(path, t)
-        $: << t if File.directory?(t)
+        if File.directory?(t) then
+          $: << t
+          test_paths << t
+        end
       end
 
       # Setup reporters
@@ -71,7 +75,8 @@ module Micron
       files.flatten!
 
       if files.empty? then
-        files = find_tests(path)
+        files = []
+        test_paths.each{ |t| files += find_tests(t) }
       end
 
       files.sort!
