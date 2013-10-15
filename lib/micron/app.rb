@@ -46,12 +46,13 @@ module Micron
       # Spawn child runner if called
       if options[:runclass] then
         require "micron/proc_runner"
-        Micron.runner = Micron::ProcRunner.new(nil, reporters)
+        methods = ENV["MICRON_METHODS"].split(/:/)
+        Micron.runner = Micron::ProcRunner.new(nil, methods, reporters)
         Micron.runner.run_class
         exit
       elsif options[:runmethod] then
         require "micron/proc_runner"
-        Micron.runner = Micron::ProcRunner.new(nil, reporters)
+        Micron.runner = Micron::ProcRunner.new(nil, nil, reporters)
         Micron.runner.run_method
         exit
       end
@@ -81,20 +82,30 @@ module Micron
 
       files.sort!
 
+      # Optionally filter files
+      if options[:tests] and !options[:tests].empty? then
+        files.reject!{ |f|
+          options[:tests].find{ |t| f.include?(t) }.nil?
+        }
+      end
+
       # Run tests
       if options[:proc] then
         require "micron/proc_runner"
-        Micron.runner = Micron::ProcRunner.new(files, reporters)
+        runner = Micron::ProcRunner
       elsif options[:fork] then
         require "micron/fork_runner"
-        Micron.runner = Micron::ForkRunner.new(files, reporters)
+        runner = Micron::ForkRunner
       else
-        Micron.runner = Micron::Runner.new(files, reporters)
+        runner = Micron::Runner
       end
+
+      Micron.runner = runner.new(files, options[:methods], reporters)
       results = Micron.runner.run
 
       Micron::Runner::Shim.cleanup!
 
+      # set a non-zero exit code if we had any failures
       exit(count_failures(results) > 0 ? 1 : 0)
     end
 

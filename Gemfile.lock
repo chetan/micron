@@ -24,7 +24,7 @@ GIT
 PATH
   remote: .
   specs:
-    micron (0.1.0)
+    micron (0.5.0)
       colorize
       easycov
       hitimes

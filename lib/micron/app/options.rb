@@ -6,7 +6,9 @@ module Micron
     class Options
 
       DEFAULTS = {
-        :coverage => true
+        :coverage => true,
+        :tests    => [],
+        :methods  => [],
       }
 
       def self.parse(options=nil)
@@ -34,6 +36,15 @@ module Micron
         parser = OptionParser.new do |opts|
           opts.banner = "usage: #{$0} [options]"
 
+          opts.on("-t", "--test PATTERN", "Only run test files matching pattern") do |p|
+            options[:tests] << p
+          end
+
+          opts.on("-m", "--method PATTERN", "Only run test methods matching pattern") do |p|
+            p.strip!
+            options[:methods] << p if not p.empty?
+          end
+
           opts.on("--nocov", "Disable coverage reporting") {
             options[:coverage] = false
           }
@@ -53,6 +64,11 @@ module Micron
           opts.on("--runmethod", "Run method in child process") {
             options[:runmethod] = true
           }
+
+          opts.on("-h", "--help", "Show this message") do
+            puts opts
+            exit
+          end
         end
 
         begin

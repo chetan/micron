@@ -26,10 +26,11 @@ module Micron
 
     attr_reader :results
 
-    def initialize(files, reporters)
-      @files     = files
-      @results   = []
-      @reporters = reporters || []
+    def initialize(files, method_patterns, reporters)
+      @files           = files
+      @method_patterns = method_patterns || []
+      @reporters       = reporters || []
+      @results         = []
 
       @mutex = Mutex.new
 
@@ -46,7 +47,7 @@ module Micron
 
       @files.each do |file|
 
-        test_file = TestFile.new(file)
+        test_file = TestFile.new(file, @method_patterns)
         report(:start_file, test_file)
 
         begin

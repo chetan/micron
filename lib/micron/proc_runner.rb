@@ -7,8 +7,8 @@ require "micron/test_case/teardown_coverage"
 module Micron
   class ProcRunner < Runner
 
-    def initialize(files=nil, reporters=nil)
-      super(files, reporters)
+    def initialize(files=nil, method_patterns=nil, reporters=nil)
+      super(files, method_patterns, reporters)
     end
 
     def run

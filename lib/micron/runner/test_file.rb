@@ -3,8 +3,9 @@ module Micron
   class Runner
     class TestFile
 
-      def initialize(filename)
-        @filename = filename
+      def initialize(filename, method_patterns)
+        @filename        = filename
+        @method_patterns = method_patterns
       end
 
       # Load the test file
@@ -41,7 +42,7 @@ module Micron
         test_clazz = TestCase.subclasses.last
 
         begin
-          clazz = run_clazz.new(test_clazz, @filename)
+          clazz = run_clazz.new(test_clazz, @filename, @method_patterns)
 
           Micron.runner.report(:start_class, clazz)
           if !clazz.methods.empty? then
