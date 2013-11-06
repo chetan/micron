@@ -17,7 +17,7 @@ module Micron
           $0 = "micron: class"
           # ERR.puts "micron: class (#{$$})"
 
-          test_file = TestFile.new(file)
+          test_file = TestFile.new(file, @method_patterns)
           report(:start_file, test_file)
 
           begin
