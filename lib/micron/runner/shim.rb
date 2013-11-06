@@ -14,7 +14,7 @@ module Micron
 
 if ENV["BUNDLE_GEMFILE"] then
   require "bundler"
-  Bundler.setup(:default, :development)
+  Bundler.setup(:default, :development, :test)
 end
 
 require "easycov"
