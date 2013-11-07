@@ -39,13 +39,18 @@ module Micron
 
           time(:setup)   { setup(t) }
 
-          time(:runtime) { t.send(name) }
+          # run actual test method and measure runtime
+          @runtime = Hitimes::Interval.now
+          t.send(name)
+          @durations[:runtime] = @runtime.stop
           self.passed = true
 
         rescue *PASSTHROUGH_EXCEPTIONS
+          @durations[:runtime] = @runtime.stop if @runtime
           raise
 
         rescue Exception => e
+          @durations[:runtime] = @runtime.stop if @runtime
           self.passed = false
           self.ex     = ExceptionInfo.new(e)
 
