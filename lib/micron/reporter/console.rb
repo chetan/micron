@@ -101,7 +101,7 @@ module Micron
         real_runtime = sprintf("%0.3f", @runtime.duration)
 
         puts
-        puts divider(fail > 0 ? :red : :green)
+        puts divider(fail > 0 ? :red : (skip > 0 ? :yellow : :green))
         puts "  PASS: #{pass},  FAIL: #{fail},  SKIP: #{skip}"
         puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds (wall time: #{real_runtime})"
 
@@ -116,7 +116,7 @@ module Micron
             }
           }
         end
-        puts divider(fail > 0 ? :red : :green)
+        puts divider(fail > 0 ? :red : (skip > 0 ? :yellow : :green))
       end
 
 
