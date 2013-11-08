@@ -9,12 +9,21 @@ module Micron
     include LifecycleHooks
     include Assertions
 
+    # Run before all test methods in the class
+    def self.before_class
+    end
+
+    # Run after all test methods in the class
+    def self.after_class
+    end
+
+    # Run before each test method
     def setup
     end
 
+    # Run after each test method
     def teardown
     end
-
 
     # retrieve all loaded subclasses of this class
     #

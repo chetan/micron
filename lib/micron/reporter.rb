@@ -11,7 +11,13 @@ module Micron
     def start_class(clazz)
     end
 
+    def before_class_error(ex)
+    end
+
     def end_method(method)
+    end
+
+    def after_class_error(ex)
     end
 
     def end_class(clazz)

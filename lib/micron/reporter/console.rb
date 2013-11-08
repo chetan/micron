@@ -19,6 +19,22 @@ module Micron
         puts clazz.name
       end
 
+      def before_class_error(ex)
+        puts
+        puts indent(bar(underline("Error during before_class; skipping tests")))
+        puts indent(bar("<#{ex.class}> #{ex.message}"))
+        puts indent(bar(Micron.filter_backtrace(ex.backtrace).join("\n")))
+        puts
+      end
+
+      def after_class_error(ex)
+        puts
+        puts indent(bar(underline("Error during after_class")))
+        puts indent(bar("<#{ex.class}> #{ex.message}"))
+        puts indent(bar(Micron.filter_backtrace(ex.backtrace).join("\n")))
+        puts
+      end
+
       def end_method(m)
         name = m.name.to_s
         duration = sprintf("%0.3f", m.total_duration)
@@ -135,6 +151,12 @@ module Micron
       def indent(str, amount=2)
         i = (" "*amount)
         (i + str.gsub(/\n/, "\n#{i}")).rstrip
+      end
+
+      def bar(str)
+        b = "|"
+        str = b + indent(str, 1)
+        str.gsub(/\n/, "\n#{b}")
       end
 
       # Add an underline to the given string
