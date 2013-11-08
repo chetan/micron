@@ -59,9 +59,9 @@ module Micron
 
         results.each do |clazz|
           if clazz.kind_of? Exception then
-            puts "Error loading test file: #{file}"
-            puts clazz
-            puts clazz.backtrace
+            STDERR.puts "Error loading test file: #{file}"
+            STDERR.puts clazz
+            STDERR.puts clazz.backtrace
             exit 1
           end
 
