@@ -22,16 +22,14 @@ module Micron
       def before_class_error(ex)
         puts
         puts indent(bar(underline("Error during before_class; skipping tests")))
-        puts indent(bar("<#{ex.class}> #{ex.message}"))
-        puts indent(bar(Micron.filter_backtrace(ex.backtrace).join("\n")))
+        puts indent(bar(Micron.dump_ex(ex, true)))
         puts
       end
 
       def after_class_error(ex)
         puts
         puts indent(bar(underline("Error during after_class")))
-        puts indent(bar("<#{ex.class}> #{ex.message}"))
-        puts indent(bar(Micron.filter_backtrace(ex.backtrace).join("\n")))
+        puts indent(bar(Micron.dump_ex(ex, true)))
         puts
       end
 
