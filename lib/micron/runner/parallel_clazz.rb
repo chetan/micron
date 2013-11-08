@@ -14,6 +14,7 @@ module Micron
         tests = []
         debug "spawning #{methods.size} methods"
         methods.each do |method|
+          Micron.runner.report(:start_method, method) # TODO not sure about this
           tests << spawn_test(method)
         end
 

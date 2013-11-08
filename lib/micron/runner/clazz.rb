@@ -20,6 +20,7 @@ module Micron
 
       def run
         methods.each do |method|
+          Micron.runner.report(:start_method, method)
           method.run
           Micron.runner.report(:end_method, method)
         end

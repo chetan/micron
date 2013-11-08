@@ -104,6 +104,7 @@ module Micron
 
         if !clazz.methods.empty? then
           clazz.methods.each do |method|
+            Micron.runner.report(:start_method, method)
             method.ex = Micron::Skip.new("before_class failed")
             Micron.runner.report(:end_method, method)
           end

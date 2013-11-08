@@ -14,6 +14,9 @@ module Micron
     def before_class_error(ex)
     end
 
+    def start_method(method)
+    end
+
     def end_method(method)
     end
 
