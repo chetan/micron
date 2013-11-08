@@ -24,7 +24,7 @@ module Micron
       NoMemoryError, SignalException, Interrupt, SystemExit
     ]
 
-    attr_reader :results
+    attr_reader :results, :reporters, :files
 
     def initialize(files, method_patterns, reporters)
       @files           = files
