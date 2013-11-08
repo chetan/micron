@@ -1,5 +1,5 @@
 
-require "colorize"
+require "ansi"
 
 module Micron
   class Reporter
@@ -29,11 +29,11 @@ module Micron
 
         # inject color after so we don't screw up the alignment
         if m.skipped? then
-          str.gsub!(/#{status}$/, status.colorize(:light_yellow))
+          str.gsub!(/#{status}$/, colorize(status, :yellow))
         elsif m.passed? then
-          str.gsub!(/#{status}$/, status.colorize(:light_green))
+          str.gsub!(/#{status}$/, colorize(status, :green))
         else
-          str.gsub!(/#{status}$/, status.colorize(:light_red))
+          str.gsub!(/#{status}$/, colorize(status, :red))
         end
         puts str
 
@@ -101,7 +101,7 @@ module Micron
         real_runtime = sprintf("%0.3f", @runtime.duration)
 
         puts
-        puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
+        puts divider(fail > 0 ? :red : :green)
         puts "  PASS: #{pass},  FAIL: #{fail},  SKIP: #{skip}"
         puts "  TOTAL: #{total} with #{total_assertions} assertions in #{total_duration} seconds (wall time: #{real_runtime})"
 
@@ -116,7 +116,7 @@ module Micron
             }
           }
         end
-        puts ("="*CONSOLE_WIDTH).colorize((fail > 0 ? :light_red : :light_green))
+        puts divider(fail > 0 ? :red : :green)
       end
 
 
@@ -137,8 +137,27 @@ module Micron
         (i + str.gsub(/\n/, "\n#{i}")).rstrip
       end
 
+      # Add an underline to the given string
+      #
+      # @param [String] str       string to underline
+      #
+      # @return [String] underlined string
       def underline(str)
         str += "\n" + "-"*str.length
+      end
+
+      # Draw a divider CONSOLE_WIDTH chars wide in the given color
+      def divider(color)
+        colorize(("="*CONSOLE_WIDTH), color)
+      end
+
+      def colorize(str, color, bold=true)
+        ret  = ANSI.reset
+        ret += ANSI.bold if bold
+        ret += ANSI.send(color)
+        ret += str
+        ret += ANSI.reset
+        ret
       end
 
     end

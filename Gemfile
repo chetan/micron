@@ -7,7 +7,7 @@ end
 gem "easycov", :github => "chetan/easycov"
 
 gem "hitimes"
-gem "colorize"
+gem "ansi"
 
 group :development do
   gem "yard", "~> 0.8"

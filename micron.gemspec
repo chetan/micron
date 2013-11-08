@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chetan Sarva"]
-  s.date = "2013-10-14"
+  s.date = "2013-11-08"
   s.description = "An extremely minimal unit test library for Ruby"
   s.email = "chetan@pixelcop.net"
   s.executables = ["micron"]
@@ -70,7 +70,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<easycov>, [">= 0"])
       s.add_runtime_dependency(%q<hitimes>, [">= 0"])
-      s.add_runtime_dependency(%q<colorize>, [">= 0"])
+      s.add_runtime_dependency(%q<ansi>, [">= 0"])
       s.add_development_dependency(%q<yard>, ["~> 0.8"])
       s.add_development_dependency(%q<bundler>, ["~> 1.1"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
@@ -78,7 +78,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<easycov>, [">= 0"])
       s.add_dependency(%q<hitimes>, [">= 0"])
-      s.add_dependency(%q<colorize>, [">= 0"])
+      s.add_dependency(%q<ansi>, [">= 0"])
       s.add_dependency(%q<yard>, ["~> 0.8"])
       s.add_dependency(%q<bundler>, ["~> 1.1"])
       s.add_dependency(%q<jeweler>, [">= 0"])
@@ -87,7 +87,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<easycov>, [">= 0"])
     s.add_dependency(%q<hitimes>, [">= 0"])
-    s.add_dependency(%q<colorize>, [">= 0"])
+    s.add_dependency(%q<ansi>, [">= 0"])
     s.add_dependency(%q<yard>, ["~> 0.8"])
     s.add_dependency(%q<bundler>, ["~> 1.1"])
     s.add_dependency(%q<jeweler>, [">= 0"])
