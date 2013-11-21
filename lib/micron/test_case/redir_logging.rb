@@ -1,6 +1,23 @@
 
 require "logging"
 
+# Helper for redirecting 'logging' messages to STDOUT when running tests
+#
+# You can redirect all logs (root logger) with the following:
+#
+# class TestCase < ActiveSupport::TestCase
+#   include Micron::TestCase::RedirLogging
+#   self.redir_logger = Logging.logger.root
+# end
+#
+# Or only a specific hierarchy like so:
+#
+# class TestCase < ActiveSupport::TestCase
+#   include Micron::TestCase::RedirLogging
+#   self.redir_logger = Logging.logger[Bixby]
+# end
+#
+
 module Micron
   class TestCase
     module RedirLogging
@@ -41,7 +58,10 @@ module Micron
       end
 
       module ClassMethods
-        attr_writer :redir_logger
+
+        def redir_logger=(logger)
+          @redir_logger = logger
+        end
 
         # Search up the TestCase hierarchy for a redir_logger
         def redir_logger
