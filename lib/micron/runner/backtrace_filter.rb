@@ -25,7 +25,7 @@ module Micron
         end
 
         # make sure we didn't remove everything - if we did, the error was in our code
-        new_bt = bt.reject { |line| line =~ %r{(bin|lib)/micron} } if new_bt.empty?
+        new_bt = bt.reject { |line| line =~ %r{(bin|lib)/(micron|zeus|spork)} } if new_bt.empty?
         new_bt = bt.dup if new_bt.empty?
       else
         new_bt = bt.dup
