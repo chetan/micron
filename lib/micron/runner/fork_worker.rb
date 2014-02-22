@@ -163,6 +163,9 @@ module Micron
       # Cleanup all FDs inherited from the parent. We don't need them and we
       # may throw errors if they are left open. 8192 should be high enough.
       def clean_parent_file_descriptors
+        ObjectSpace.each_object(File) {|f| f.close unless f.closed? rescue nil}
+        return
+
         # Don't clean $stdin, $stdout, $stderr (0-2) or our own pipes
         keep = [ @child_write.to_i, @out.last.to_i, @err.last.to_i ]
         keep += @liveness_checker.fds if @liveness_checker
