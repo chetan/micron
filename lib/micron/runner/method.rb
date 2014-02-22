@@ -59,6 +59,7 @@ module Micron
           time(:teardown) {
             teardown(t) if not t.nil?
           }
+          @runtime = nil
         end
       end
 
