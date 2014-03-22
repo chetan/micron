@@ -25,7 +25,7 @@ PATH
   remote: .
   specs:
     micron (0.5.0)
-      colorize
+      ansi
       easycov
       hitimes
 
@@ -35,7 +35,6 @@ GEM
     addressable (2.3.5)
     ansi (1.4.3)
     builder (3.2.2)
-    colorize (0.6.0)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     git (1.2.6)
@@ -53,7 +52,6 @@ GEM
     json (1.8.0)
     jwt (0.1.8)
       multi_json (>= 1.5)
-    minitest (4.7.5)
     multi_json (1.8.0)
     multi_xml (0.5.5)
     multipart-post (1.2.0)
@@ -85,5 +83,4 @@ DEPENDENCIES
   hitimes
   jeweler!
   micron!
-  minitest (~> 4.0)
   yard (~> 0.8)
