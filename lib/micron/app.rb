@@ -43,7 +43,7 @@ module Micron
       reporters = []
       reporters << Reporter::Console.new
 
-      # Spawn child runner if called
+      # Spawn ProcRunner child runner if called
       if options[:runclass] then
         require "micron/proc_runner"
         methods = ENV["MICRON_METHODS"].split(/:/)
@@ -106,7 +106,9 @@ module Micron
       Micron::Runner::Shim.cleanup!
 
       # set a non-zero exit code if we had any failures
-      exit(count_failures(results) > 0 ? 1 : 0)
+      exit_code = count_failures(results) > 0 ? 1 : 0
+      write_report(exit_code, results)
+      exit(exit_code)
     end
 
 
@@ -132,6 +134,12 @@ module Micron
         }
       }
       return fail
+    end
+
+    def write_report(exit_code, results)
+      # write exit code
+      File.open(File.join(ENV["MICRON_PATH"], "last_run"), "w") { |f| f.puts exit_code }
+      # TODO write full report as json to last_report
     end
 
   end
