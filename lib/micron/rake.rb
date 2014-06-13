@@ -1,4 +1,6 @@
 
+require "rake/tasklib"
+
 module Micron
   class Rake < ::Rake::TaskLib
 
