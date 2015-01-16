@@ -26,10 +26,12 @@ module Micron
         # Merge coverage
         EasyCov.merge!
 
-        # Write coverage
-        Micron.capture_io {
-          SimpleCov::ResultMerger.merged_result.format!
-        }
+        if !ENV["MICRON_NO_HTML"] then
+          # Write coverage
+          Micron.capture_io {
+            SimpleCov::ResultMerger.merged_result.format!
+          }
+        end
       end
 
     end
