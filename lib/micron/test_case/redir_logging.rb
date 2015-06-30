@@ -38,7 +38,13 @@ module Micron
 
         # add original appenders which do not point to stdout, and our custom
         # $stdout appender
-        logger.add_appenders(@_old_log_appenders.reject{ |a| a.kind_of? Logging::Appenders::Stdout })
+
+        current_appenders = @_old_log_appenders
+        if current_appenders.empty? then
+          current_appenders = Helper.gather_appenders(logger)
+        end
+
+        logger.add_appenders(current_appenders.reject{ |a| a.kind_of? Logging::Appenders::Stdout })
         logger.add_appenders("stdout_test")
       end
 
@@ -68,6 +74,19 @@ module Micron
           return @redir_logger if !@redir_logger.nil?
           return superclass.redir_logger if superclass.respond_to? :redir_logger
           nil
+        end
+      end
+
+      module Helper
+        # Get the list of active appenders for the given logger
+        def self.gather_appenders(logger)
+          if !logger.appenders.empty? then
+            return logger.appenders
+          end
+          if logger.respond_to?(:parent) then
+            return gather_appenders(logger.parent)
+          end
+          return [] # finally we must be at root with no appenders
         end
       end
 
@@ -102,4 +121,3 @@ Logging::Appenders::StdoutTest.new( 'stdout_test',
     :color_scheme => 'bright'
   )
 )
-
